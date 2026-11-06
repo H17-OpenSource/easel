@@ -1,0 +1,6 @@
+# Every text file is stored and checked out with LF, on every OS (tests compare some files byte for byte).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.safetensors binary
