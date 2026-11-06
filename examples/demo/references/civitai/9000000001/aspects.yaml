@@ -1,0 +1,11 @@
+schema: easel/reference-aspects/1
+reference: civitai:9000000001
+aspects:
+- aspect: pose
+  value: standing relaxed
+  weight: 0.8
+  source: operator
+- aspect: composition
+  value: plain backdrop
+  weight: 0.5
+  source: assistant

@@ -1,0 +1,62 @@
+# Model family `noobai` (NoobAI XL). Public model-family facts only.
+# Shared keys (every top-level key except `schema`, `inference` and `training`) are identical in
+# the easel and kiln copies of this file; `tools/sync_common.py --check` compares them.
+# `inherits`: a block this file leaves out is read from the parent family (the child's keys win).
+# `basis` says where a number comes from: measured on the reference machine, or a prior.
+# `inference`: easel's render defaults for this family.
+
+schema: easel/family/1
+id: noobai
+name: NoobAI XL
+status: unverified
+inherits: illustrious
+architecture:
+  kind: unet-sdxl
+  latent_channels: 4
+  text_encoders: [clip-l, clip-g]
+  native_resolution: 1024
+description: Illustrious derivative (v-pred / eps variants exist — check per file).
+licence_summary:
+  status: unverified
+  name: null
+  text: 'unverified: read the model card'
+  url: https://huggingface.co/Laxhar/noobai-XL-1.0
+# host_ram_gb: eval includes the ComfyUI server (the eval step waits for this much free RAM, then starts it).
+host_ram_gb:
+  train: 5.5
+  eval: 8.5
+  eval_includes_comfyui_server: true
+  basis: inherited from the sdxl recipe; not measured on this family
+inference:
+  basis: 'prior: widely used community defaults, not tuned on the reference machine'
+  graph_compiler: sdxl_txt2img
+  sampler: euler_ancestral
+  scheduler: normal
+  steps: 28
+  cfg: 5.0
+  clip_skip: 2
+  resolution:
+    native: [1024, 1024]
+    presets:
+      square: [1024, 1024]
+      portrait: [832, 1216]
+      landscape: [1216, 832]
+      tall: [768, 1344]
+      wide: [1344, 768]
+  prompt:
+    style: tags
+    prefix: masterpiece, best quality, newest, absurdres, highres
+    suffix: ''
+    order: <prefix><trigger>, <class word>, <scene>, <style tags>
+    notes: Illustrious derivative; same tag conventions. v-prediction variants need a different sampler
+      setup -- check the author text.
+  negative_baseline: worst quality, low quality, old, early, lowres, bad anatomy, bad hands, signature,
+    username, logo
+  lora_default_weight: 0.8
+  hires:
+    scale: 1.5
+    denoise: 0.35
+    steps: 15
+  vae:
+    shared_with: [illustrious]
+    not_interchangeable_with: []

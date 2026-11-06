@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability privately
+    url: https://github.com/H17-OpenSource/easel/security/advisories/new
+    about: Vulnerabilities and conduct reports go to a private advisory, never to a public issue (SECURITY.md).

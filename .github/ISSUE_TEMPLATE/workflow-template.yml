@@ -1,0 +1,59 @@
+name: "Workflow template"
+description: "Add or change a ComfyUI workflow template under workflows/<id>/."
+title: "[workflow-template] <id>: <one line>"
+labels: ["workflow-template"]
+body:
+  - type: markdown
+    attributes:
+      value: "A template is a graph with named slots. Every node pack it needs is named with its licence and a pinned commit. Leave out private values: no absolute paths (write `<home>`, `<models_root>`), no names or account names, no tokens, no ids of your own records, and no description of any image. Vulnerabilities do not belong here: see SECURITY.md."
+  - type: input
+    id: template_id
+    attributes:
+      label: "template id"
+      description: "lowercase, as the folder name: workflows/<id>/"
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: "what it does"
+      description: "the task, the inputs and the outputs, in a few lines"
+    validations:
+      required: true
+  - type: textarea
+    id: node_packs
+    attributes:
+      label: "node packs, licences and commits"
+      description: "one per line: name, licence read from its LICENSE file, pinned commit; or: core nodes only"
+    validations:
+      required: true
+  - type: textarea
+    id: slots
+    attributes:
+      label: "slots"
+      description: "the slot names and what fills each one: a model, a prompt, a number"
+    validations:
+      required: true
+  - type: textarea
+    id: models
+    attributes:
+      label: "model families it supports"
+      description: "the family ids and any model it requires, with their licences"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "acceptance criteria"
+      description: "Written before the work starts: each one a command and the literal line it prints, or a test that passes. The pull request is judged against exactly these."
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Checks"
+      options:
+        - label: "Every node pack is named with its licence; none is added without one."
+          required: true
+        - label: "I removed private values: no absolute paths, names, account names, tokens or ids of my own records, and no images."
+          required: true

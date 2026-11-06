@@ -1,0 +1,164 @@
+# Which resource trained for one model family works on a checkpoint of another: public facts about the model
+# architectures, no instance data. One rule per (source_family, target_family, artifact_type). The source
+# family is the family a resource was trained on (lora.trained_on_family), else the family it is filed under;
+# the target family is the checkpoint's. A pair without a rule is `untested` with confidence 0.
+# `easel registry compatible <sha16>` joins these rules with the registry; an instance adds or replaces rules
+# in <home>/data/compat.yaml (its rule wins for the same key).
+schema: easel/compat/1
+basis: public model-architecture facts (same family = native; cross-family rules from the architectures)
+# 154 rules, sorted by source family, target family, type
+rules:
+  - {source_family: anima, target_family: anima, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: anima, target_family: anima, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: anima, target_family: anima, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: anima, target_family: anima, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: anima, target_family: anima, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: anima, target_family: anima, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: anima, target_family: anima, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: flux1, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: flux1, target_family: sdxl, artifact_type: lora, verdict: broken, confidence: 0.98, reason: "DiT vs UNet."}
+  - {source_family: flux1, target_family: sdxl, artifact_type: text_encoder, verdict: broken, confidence: 0.98, reason: "FLUX needs T5-XXL + CLIP-L."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: hunyuan_video, target_family: hunyuan_video, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: illustrious, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: illustrious, target_family: noobai, artifact_type: lora, verdict: works, confidence: 0.6, reason: "NoobAI derives from Illustrious; watch v-pred variants."}
+  - {source_family: illustrious, target_family: noobai, artifact_type: vae, verdict: native, confidence: 0.9, reason: "Same VAE."}
+  - {source_family: illustrious, target_family: pony, artifact_type: lora, verdict: degraded, confidence: 0.5, reason: "Tag conventions differ substantially."}
+  - {source_family: illustrious, target_family: sd15, artifact_type: lora, verdict: broken, confidence: 0.95, reason: "Cross-architecture."}
+  - {source_family: illustrious, target_family: sdxl, artifact_type: embedding, verdict: works, confidence: 0.7, reason: "Shared CLIP-L/G encoders."}
+  - {source_family: illustrious, target_family: sdxl, artifact_type: lora, verdict: works, confidence: 0.6, reason: "Same UNet arch; Danbooru tags mostly understood by SDXL anime checkpoints."}
+  - {source_family: illustrious, target_family: sdxl, artifact_type: vae, verdict: native, confidence: 0.9, reason: "Same VAE."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: ltxv, target_family: ltxv, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: moss, target_family: moss, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: illustrious, artifact_type: lora, verdict: works, confidence: 0.6, reason: "Parent family; check v-pred/eps match."}
+  - {source_family: noobai, target_family: illustrious, artifact_type: vae, verdict: native, confidence: 0.9, reason: "Same VAE."}
+  - {source_family: noobai, target_family: noobai, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: noobai, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: noobai, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: noobai, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: noobai, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: noobai, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: noobai, target_family: noobai, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: illustrious, artifact_type: lora, verdict: degraded, confidence: 0.5, reason: "Tag conventions differ substantially; expect weak/erratic effect."}
+  - {source_family: pony, target_family: pony, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: pony, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: pony, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: pony, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: pony, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: pony, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: pony, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: pony, target_family: sd15, artifact_type: lora, verdict: broken, confidence: 0.95, reason: "Cross-architecture."}
+  - {source_family: pony, target_family: sdxl, artifact_type: embedding, verdict: works, confidence: 0.7, reason: "Shared CLIP-L/G encoders."}
+  - {source_family: pony, target_family: sdxl, artifact_type: ipadapter, verdict: works, confidence: 0.7, reason: "Identical cross-attention dims."}
+  - {source_family: pony, target_family: sdxl, artifact_type: lora, verdict: works, confidence: 0.6, reason: "Same UNet arch; score_* trigger tags absent on base SDXL."}
+  - {source_family: pony, target_family: sdxl, artifact_type: vae, verdict: native, confidence: 0.9, reason: "Same VAE."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: qwen_image, target_family: qwen_image, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: illustrious, artifact_type: lora, verdict: broken, confidence: 0.95, reason: "Cross-architecture."}
+  - {source_family: sd15, target_family: pony, artifact_type: lora, verdict: broken, confidence: 0.95, reason: "Cross-architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sd15, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd15, target_family: sdxl, artifact_type: controlnet, verdict: broken, confidence: 0.95, reason: "Different UNet block dims."}
+  - {source_family: sd15, target_family: sdxl, artifact_type: embedding, verdict: broken, confidence: 0.9, reason: "Different text encoder token space."}
+  - {source_family: sd15, target_family: sdxl, artifact_type: ipadapter, verdict: broken, confidence: 0.9, reason: "Cross-attention dims differ."}
+  - {source_family: sd15, target_family: sdxl, artifact_type: lora, verdict: broken, confidence: 0.95, reason: "Different UNet widths; tensors will not apply."}
+  - {source_family: sd15, target_family: sdxl, artifact_type: text_encoder, verdict: broken, confidence: 0.98, reason: "SD1.5 uses one CLIP-L; SDXL uses CLIP-L + CLIP-G."}
+  - {source_family: sd15, target_family: sdxl, artifact_type: vae, verdict: broken, confidence: 0.95, reason: "Different latent channels/decoder."}
+  - {source_family: sd21, target_family: sd21, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd21, target_family: sd21, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd21, target_family: sd21, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd21, target_family: sd21, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd21, target_family: sd21, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd21, target_family: sd21, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd21, target_family: sd21, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sd35, target_family: sd35, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: flux1, artifact_type: lora, verdict: broken, confidence: 0.98, reason: "UNet vs DiT. Totally different module names."}
+  - {source_family: sdxl, target_family: flux1, artifact_type: text_encoder, verdict: broken, confidence: 0.98, reason: "SDXL encoders unusable by FLUX."}
+  - {source_family: sdxl, target_family: illustrious, artifact_type: controlnet, verdict: works, confidence: 0.65, reason: "Shared UNet block structure."}
+  - {source_family: sdxl, target_family: illustrious, artifact_type: embedding, verdict: works, confidence: 0.7, reason: "Shared CLIP-L/G encoders."}
+  - {source_family: sdxl, target_family: illustrious, artifact_type: ipadapter, verdict: works, confidence: 0.7, reason: "Identical cross-attention dims."}
+  - {source_family: sdxl, target_family: illustrious, artifact_type: lora, verdict: works, confidence: 0.6, reason: "Same UNet arch. Anime tag set may fight the LoRA."}
+  - {source_family: sdxl, target_family: illustrious, artifact_type: vae, verdict: native, confidence: 0.9, reason: "VAE is architecture-level within SDXL."}
+  - {source_family: sdxl, target_family: pony, artifact_type: controlnet, verdict: works, confidence: 0.65, reason: "ControlNet binds to UNet block structure, shared in SDXL derivatives."}
+  - {source_family: sdxl, target_family: pony, artifact_type: embedding, verdict: works, confidence: 0.7, reason: "Textual inversion binds to the text encoder, which is shared."}
+  - {source_family: sdxl, target_family: pony, artifact_type: ipadapter, verdict: works, confidence: 0.7, reason: "IPAdapter binds to cross-attention dims, identical across SDXL derivatives."}
+  - {source_family: sdxl, target_family: pony, artifact_type: lora, verdict: works, confidence: 0.6, reason: "Same UNet arch. Tag conventions differ, so effect is partial/unpredictable."}
+  - {source_family: sdxl, target_family: pony, artifact_type: vae, verdict: native, confidence: 0.9, reason: "VAE is architecture-level, family-agnostic within SDXL."}
+  - {source_family: sdxl, target_family: sd15, artifact_type: controlnet, verdict: broken, confidence: 0.95, reason: "Different UNet block dims."}
+  - {source_family: sdxl, target_family: sd15, artifact_type: embedding, verdict: broken, confidence: 0.9, reason: "Different text encoder token space."}
+  - {source_family: sdxl, target_family: sd15, artifact_type: ipadapter, verdict: broken, confidence: 0.9, reason: "Cross-attention dims differ."}
+  - {source_family: sdxl, target_family: sd15, artifact_type: lora, verdict: broken, confidence: 0.95, reason: "Different UNet widths; tensors will not apply."}
+  - {source_family: sdxl, target_family: sd15, artifact_type: text_encoder, verdict: broken, confidence: 0.98, reason: "Different encoder set."}
+  - {source_family: sdxl, target_family: sd15, artifact_type: vae, verdict: broken, confidence: 0.95, reason: "Different latent channels/decoder."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: sdxl, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: sdxl, target_family: wan21, artifact_type: lora, verdict: broken, confidence: 0.98, reason: "Image UNet vs video DiT."}
+  - {source_family: wan21, target_family: sdxl, artifact_type: lora, verdict: broken, confidence: 0.98, reason: "Video DiT vs image UNet."}
+  - {source_family: wan21, target_family: wan21, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan21, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan21, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan21, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan21, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan21, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan21, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan21, target_family: wan22, artifact_type: lora, verdict: degraded, confidence: 0.5, reason: "Related but VAE channels differ (16 vs 48); verify per file."}
+  - {source_family: wan21, target_family: wan22, artifact_type: vae, verdict: broken, confidence: 0.95, reason: "WAN 2.1 and 2.2 VAEs have different channel counts."}
+  - {source_family: wan22, target_family: wan21, artifact_type: lora, verdict: degraded, confidence: 0.5, reason: "Related but VAE channels differ."}
+  - {source_family: wan22, target_family: wan21, artifact_type: vae, verdict: broken, confidence: 0.95, reason: "WAN 2.1 and 2.2 VAEs have different channel counts."}
+  - {source_family: wan22, target_family: wan22, artifact_type: controlnet, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan22, target_family: wan22, artifact_type: embedding, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan22, target_family: wan22, artifact_type: ipadapter, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan22, target_family: wan22, artifact_type: lora, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan22, target_family: wan22, artifact_type: lycoris, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan22, target_family: wan22, artifact_type: text_encoder, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}
+  - {source_family: wan22, target_family: wan22, artifact_type: vae, verdict: native, confidence: 0.95, reason: "Same family: trained/derived for this architecture."}

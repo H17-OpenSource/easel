@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:run-manifest:1",
+  "title": "what a run was made with",
+  "description": "<home>/runs/<run-id>/manifest.json: the resources with their hashes and weights, the graph's hash and the server version, so an output can be reproduced or explained later.",
+  "x-file": "<home>/runs/<run-id>/manifest.json",
+  "x-owner": "tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "run",
+    "written_at",
+    "resources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/run-manifest/1",
+      "description": "the format and its version; always the first key"
+    },
+    "run": {
+      "$ref": "#/$defs/run_id"
+    },
+    "written_at": {
+      "$ref": "#/$defs/ts"
+    },
+    "graph_sha256": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "comfyui": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node_packs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "commit": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "slot",
+          "resource",
+          "file_name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "enum": [
+              "checkpoint",
+              "lora",
+              "lycoris",
+              "embedding",
+              "vae",
+              "upscaler",
+              "controlnet",
+              "ipadapter",
+              "clip",
+              "text_encoder",
+              "detector"
+            ],
+            "description": "the resource's role in the graph"
+          },
+          "slot": {
+            "type": "string",
+            "pattern": "^([a-z]+(\\.\\d+)?)?$"
+          },
+          "resource": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/sha16"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/sha256"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "weight": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "seeds": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  },
+  "$defs": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^run-\\d{8}-[a-z0-9][a-z0-9_-]*$",
+      "description": "a run id: run-YYYYMMDD-<slug>, for example run-20300101-001"
+    },
+    "sha16": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "a resource id: the first 16 hex digits of the file's sha256"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "lower-case hex sha256 of the file bytes"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    }
+  }
+}

@@ -1,0 +1,9 @@
+# Example of easel/overrides/1 (synthetic: demo_robot, 2030).
+schema: easel/overrides/1
+resources:
+  cf56db17414bcb55:
+    set:
+      provenance.source_class: self-trained
+      semantics.category: character
+    note: trained with kiln, project demo_robot
+    at: '2030-01-01T06:00:00+00:00'

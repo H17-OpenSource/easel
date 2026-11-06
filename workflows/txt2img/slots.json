@@ -1,0 +1,124 @@
+{
+  "schema": "easel/workflow-slots/1",
+  "workflow": "txt2img",
+  "slots": [
+    {
+      "name": "checkpoint",
+      "node": "1",
+      "input": "ckpt_name",
+      "kind": "resource",
+      "role": "checkpoint",
+      "required": true,
+      "note": "the checkpoint's file name as the server lists it"
+    },
+    {
+      "name": "positive",
+      "node": "2",
+      "input": "text",
+      "kind": "text",
+      "role": null,
+      "required": true,
+      "note": "the full positive prompt"
+    },
+    {
+      "name": "negative",
+      "node": "3",
+      "input": "text",
+      "kind": "text",
+      "role": null,
+      "required": false,
+      "default": "",
+      "note": null
+    },
+    {
+      "name": "width",
+      "node": "4",
+      "input": "width",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 1024,
+      "note": null
+    },
+    {
+      "name": "height",
+      "node": "4",
+      "input": "height",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 1024,
+      "note": null
+    },
+    {
+      "name": "batch",
+      "node": "4",
+      "input": "batch_size",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 1,
+      "note": null
+    },
+    {
+      "name": "seed",
+      "node": "5",
+      "input": "seed",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 0,
+      "note": null
+    },
+    {
+      "name": "steps",
+      "node": "5",
+      "input": "steps",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 30,
+      "note": null
+    },
+    {
+      "name": "cfg",
+      "node": "5",
+      "input": "cfg",
+      "kind": "float",
+      "role": null,
+      "required": false,
+      "default": 6.0,
+      "note": null
+    },
+    {
+      "name": "sampler",
+      "node": "5",
+      "input": "sampler_name",
+      "kind": "choice",
+      "role": null,
+      "required": false,
+      "default": "dpmpp_2m",
+      "note": null
+    },
+    {
+      "name": "scheduler",
+      "node": "5",
+      "input": "scheduler",
+      "kind": "choice",
+      "role": null,
+      "required": false,
+      "default": "karras",
+      "note": null
+    },
+    {
+      "name": "filename_prefix",
+      "node": "7",
+      "input": "filename_prefix",
+      "kind": "text",
+      "role": null,
+      "required": false,
+      "default": "easel/txt2img",
+      "note": "the runner sets easel/<run-id>"
+    }
+  ]
+}

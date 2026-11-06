@@ -1,0 +1,57 @@
+schema: easel/reference/1
+id: civitai:9000000001
+legacy_id: null
+source: civitai
+source_id: '9000000001'
+source_host: civitai.com
+media_type: image
+author: demo_author
+base_model: Illustrious
+width: 8
+height: 8
+nsfw_level: None
+rating: sfw
+post_id: '9000000301'
+url: null
+file: media.png
+bytes: 1241
+sha256: 4f6733f7e1c07937fbf16a145f76a31acb1fc2d75b55dccb359eb9361bec3c97
+recipe:
+  format: comfy
+  confidence: high
+  seed: 1004
+  model: Demo Anime XL
+  model_version: '9000000102'
+  sampler: euler_ancestral
+  scheduler: normal
+  steps: 28
+  cfg: 5.5
+  clip_skip: null
+  denoise: 1.0
+  prompt: dmrbt, robot, front view, plain background
+  negative: lowres, blurry, text, watermark
+  trigger_words:
+  - dmrbt
+  duration_s: null
+  workflow_kind: txt2img
+  ecosystem: null
+raw:
+  record: null
+  comfy_graph: null
+  meta: null
+stats: null
+comment_count: 0
+extraction:
+  status: ok
+  notes: null
+embedded:
+  kind: comfyui
+  keys:
+  - prompt
+  parameters: null
+  workflow_file: null
+  api_file: null
+  scanned_at: '2030-01-01T08:01:00+00:00'
+category: pose
+collected_at: '2030-01-01T08:00:00+00:00'
+updated_at: '2030-01-01T08:01:00+00:00'

@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:reference:1",
+  "title": "a saved inspiration image or video",
+  "description": "<home>/references/<source>/<source-id>/reference.yaml: what was captured from the public API and what the media file's own metadata says. The raw API record stays beside it (raw.json) as a pointer target; the person's words go into notes.jsonl, the distilled aspects into aspects.yaml.",
+  "x-file": "<home>/references/<source>/<source-id>/reference.yaml",
+  "x-owner": "tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "source",
+    "source_id",
+    "media_type",
+    "rating",
+    "recipe",
+    "extraction",
+    "collected_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/reference/1",
+      "description": "the format and its version; always the first key"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z]+:[0-9A-Za-z_-]+$",
+      "description": "<source>:<source-id>, for example civitai:9000000001"
+    },
+    "legacy_id": {
+      "$ref": "#/$defs/legacy_id"
+    },
+    "source": {
+      "enum": [
+        "civitai",
+        "huggingface",
+        "other"
+      ]
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "source_host": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "media_type": {
+      "enum": [
+        "image",
+        "video",
+        null
+      ]
+    },
+    "author": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "width": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "height": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "nsfw_level": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rating": {
+      "$ref": "#/$defs/rating"
+    },
+    "post_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "url": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/url"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "file": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/relpath"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "the media file, relative to this record's folder"
+    },
+    "bytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "sha256": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recipe": {
+      "type": "object",
+      "required": [
+        "format",
+        "confidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "a1111",
+            "comfy",
+            "civitai",
+            "video",
+            "partial",
+            "none",
+            null
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "none",
+            null
+          ]
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sampler": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scheduler": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "steps": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "cfg": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "clip_skip": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "denoise": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "prompt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "negative": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trigger_words": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "duration_s": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "workflow_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ecosystem": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "raw": {
+      "type": "object",
+      "description": "pointers to the raw blobs beside this file",
+      "additionalProperties": false,
+      "properties": {
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comfy_graph": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "meta": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "stats": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "comment_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "extraction": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "ok",
+            "partial",
+            "no-recipe",
+            "error"
+          ]
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "embedded": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "comfyui",
+                "a1111",
+                "video-comfyui",
+                "other",
+                "none"
+              ]
+            },
+            "keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "parameters": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "workflow_file": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/relpath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "api_file": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/relpath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scanned_at": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ts"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "category": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "collected_at": {
+      "$ref": "#/$defs/ts"
+    },
+    "updated_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "legacy": {
+      "$ref": "#/$defs/legacy"
+    }
+  },
+  "$defs": {
+    "legacy": {
+      "type": "object",
+      "description": "fields of an imported record that this format has no place for yet, kept verbatim by the import; tools ignore this block"
+    },
+    "legacy_id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "description": "records imported from another store keep their original id in legacy_id; null for records made here. It lets an imported record be traced back and is never shown in public text"
+    },
+    "rating": {
+      "enum": [
+        "sfw",
+        "suggestive",
+        "explicit",
+        "unknown"
+      ],
+      "description": "content rating; unknown is treated as not sfw (policy.unknown_rating_is)"
+    },
+    "relpath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$",
+      "description": "a path relative to the root its record names: forward slashes, no drive, no leading slash, no `..`"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "lower-case hex sha256 of the file bytes"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://",
+      "description": "an http(s) URL"
+    }
+  }
+}

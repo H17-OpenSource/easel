@@ -1,0 +1,48 @@
+{
+  "schema": "easel/comfyui-lock/1",
+  "recorded_at": "2026-11-05",
+  "note": "Hand-pinned. ComfyUI and every node pack are separate programs under their own licences: easel drives them over ComfyUI's HTTP API only and never imports, vendors or copies their code. The user installs them at these commits. Licences were read from each project's LICENSE file on the recorded date. Not legal advice.",
+  "comfyui": {
+    "name": "ComfyUI",
+    "repo": "https://github.com/Comfy-Org/ComfyUI",
+    "version": "0.43.1",
+    "tag": "v0.43.1",
+    "commit": "086099f5d8886163ef77dc354f8382cb7431582a",
+    "licence": "GPL-3.0",
+    "licence_checked_at": "2026-11-05"
+  },
+  "tested_with": {
+    "python": "3.12.6",
+    "torch": "2.14.1+cu130",
+    "torchvision": "0.29.1+cu130",
+    "os": "Windows 11",
+    "gpu": "NVIDIA, 8 GB"
+  },
+  "node_packs": [
+    {
+      "name": "ComfyUI-Impact-Pack",
+      "repo": "https://github.com/ltdrdata/ComfyUI-Impact-Pack",
+      "version": "8.30",
+      "commit": "082523b2dbbe0a38282f021ad3a0e33e9f222562",
+      "licence": "GPL-3.0",
+      "licence_checked_at": "2026-11-05",
+      "tested_with": {"comfyui": "0.43.1", "check": "requirements installed, start-up test passed, no import failures (2026-11-04)"},
+      "needed_by": [{"workflow": "detailer", "nodes": ["FaceDetailer"]}],
+      "notes": "The commit is 8.30 plus four upstream commits (Windows path fixes). Its requirements pull sam2 from its source repository, which compiles a CUDA extension by default: install sam2 at a pinned commit with SAM2_BUILD_CUDA=0 and without build isolation. The detailer workflow is unavailable without this pack."
+    },
+    {
+      "name": "ComfyUI-Impact-Subpack",
+      "repo": "https://github.com/ltdrdata/ComfyUI-Impact-Subpack",
+      "version": "1.3.5",
+      "commit": "50c7b71a6a224734cc9b21963c6d1926816a97f1",
+      "licence": "AGPL-3.0",
+      "licence_checked_at": "2026-11-05",
+      "tested_with": {"comfyui": "0.43.1", "check": "requirements installed, start-up test passed, no import failures (2026-11-04)"},
+      "needed_by": [{"workflow": "detailer", "nodes": ["UltralyticsDetectorProvider"]}],
+      "requires": [
+        {"name": "ultralytics", "spec": ">=8.3.162", "licence": "AGPL-3.0"}
+      ],
+      "notes": "Provides UltralyticsDetectorProvider and installs ultralytics (AGPL-3.0) into the user's ComfyUI environment; neither kiln nor easel imports ultralytics. AGPL-3.0 section 13 duties fall on whoever exposes that ComfyUI as a network service. ultralytics may pip-install further packages at run time. The detailer workflow is unavailable without this pack."
+    }
+  ]
+}

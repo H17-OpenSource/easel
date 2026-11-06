@@ -1,0 +1,73 @@
+{
+  "schema": "easel/run/1",
+  "id": "run-20300101-001",
+  "legacy_id": null,
+  "recipe": "rcp-20300101-001",
+  "workflow": null,
+  "job": "job-20300101-001",
+  "created_at": "2030-01-01T10:00:00+00:00",
+  "status": "ok",
+  "prompt_id": "00000000-0000-4000-8000-000000000001",
+  "seed": 1001,
+  "count": 4,
+  "prompt": "dmrbt, robot, standing in a tidy workshop, soft daylight, full body",
+  "negative": "lowres, blurry, text, watermark",
+  "width": 832,
+  "height": 1216,
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "denoise": 1.0,
+  "started_at": "2030-01-01T10:01:00+00:00",
+  "finished_at": "2030-01-01T10:05:00+00:00",
+  "duration_s": 240.0,
+  "gpu_peak_mb": 5000,
+  "graph": "graph.json",
+  "manifest": "manifest.json",
+  "outputs": [
+    {
+      "n": 1,
+      "file": "outputs/001.png",
+      "sha256": "26dab1e01d59632132e19555b9d483384cc95f5ddd6df503a6da591cea35759d",
+      "bytes": 1854,
+      "width": 8,
+      "height": 8,
+      "seed": 1001,
+      "metadata_stripped": false
+    },
+    {
+      "n": 2,
+      "file": "outputs/002.png",
+      "sha256": "787a456e8a3d399b30c9e213627868c2d45e3d6f06d721877fa2cfde4f1f5db9",
+      "bytes": 1854,
+      "width": 8,
+      "height": 8,
+      "seed": 1002,
+      "metadata_stripped": false
+    },
+    {
+      "n": 3,
+      "file": "outputs/003.png",
+      "sha256": "d868e1e514bfd73653785c9a5496df60d7c02e14427fd58a7281b0108f4b18e5",
+      "bytes": 1854,
+      "width": 8,
+      "height": 8,
+      "seed": 1003,
+      "metadata_stripped": false
+    },
+    {
+      "n": 4,
+      "file": "outputs/004.png",
+      "sha256": "678c78f063ebbc57df1dbf1e4503b9b3a2607c755304f5be64587011723b7005",
+      "bytes": 1854,
+      "width": 8,
+      "height": 8,
+      "seed": 1004,
+      "metadata_stripped": false
+    }
+  ],
+  "imported_from": null,
+  "error": null,
+  "notes": null
+}

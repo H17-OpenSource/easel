@@ -1,0 +1,465 @@
+#!/usr/bin/env python3
+"""The pre-push privacy gate: refuse a push whose new commits carry a private or machine-specific value.
+
+git runs it as the `pre-push` hook that tools/install-hooks.py writes. By hand, from the clone:
+
+  echo "refs/heads/main <local sha> refs/heads/main <remote sha>" | \
+      python tools/pre-push-gate --words <private list> --identity "Name <e-mail>" origin
+
+Input: the lines git passes on stdin, one per pushed ref: `<local ref> <local sha> <remote ref> <remote sha>`.
+For each ref the gate takes the commits the remote lacks (`<remote sha>..<local sha>`; for a new ref, every
+commit that no remote-tracking ref of that remote reaches) and checks in each commit:
+- every added line and the path of every added or changed file: the public patterns, the allowlist (never for
+  paths under tests/) and the private word list, through this checkout's scanner (`<pkg>._common.privacy`);
+- the commit message: the same lists; the e-mail addresses of the allowed identities and of `--trailer-email`
+  are excused there only, so a trailer may carry one;
+- the author and the committer: each must be one of the `--identity` values and must not match the private list;
+- the dates: the author's and the committer's (and a tagger's) UTC offset must be +0000, because a local offset
+  tells where the author lives and when they work. The publish route authors its snapshot in UTC; to fix a
+  refused commit, set TZ=UTC (or GIT_AUTHOR_DATE and GIT_COMMITTER_DATE ending in +0000) and amend or rebase;
+- binary files: refused, because nothing binary is ever committed to these repositories (fixture media are
+  generated at test time into an ignored folder);
+- annotated tags: the tag message and the tagger, the same way.
+Then gitleaks runs over the same commits when it is on PATH; `--no-gitleaks` skips it with a warning.
+
+Output: counts per commit and category, never the matched text; `--explain` adds file:line.
+Exit 0: push allowed. 1: hits, push refused. 2: the gate cannot run (no private list or an unreadable one, no
+allowed identity, the scanner missing, git failing): it fails closed, which refuses the push too.
+Every run that reaches the repository appends one line (time, refs, commits, hits, gitleaks state, result) to
+`<git dir>/pre-push-gate.log`, which never leaves the clone.
+"""
+
+from __future__ import annotations
+
+import argparse
+import importlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import unicodedata
+from collections import Counter
+from collections.abc import Sequence
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+DATA = REPO / "data" / "privacy"
+PACKAGES = ("easel", "kiln")  # the vendored scanner is byte-identical in both packages
+LOG_NAME = "pre-push-gate.log"
+EXIT_ALLOWED, EXIT_REFUSED, EXIT_CANNOT_RUN = 0, 1, 2
+ZERO_SHA = re.compile(r"^0+$")
+SHA = re.compile(r"^[0-9a-f]{7,64}$")
+IDENTITY = re.compile(r"^\s*(?P<name>[^<>]*?)\s*<(?P<email>[^<>\s]+)>\s*$")
+PERSON_LINE = re.compile(r"^(?P<role>author|committer|tagger) (?P<name>[^<>]*?)\s*<(?P<email>[^<>]*)>"
+                         r"(?:\s+(?P<epoch>-?\d+)\s+(?P<tz>[+-]\d{4}))?\s*$")
+UTC_OFFSET = "+0000"
+HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
+DIFF_OPTIONS = ("-r", "--no-commit-id", "--no-renames", "--diff-filter=ACMT", "--no-color", "--no-ext-diff",
+                "--no-textconv")
+
+
+class GateError(Exception):
+    """The gate cannot run; the message follows `gate cannot run:` and the exit code is 2."""
+
+
+# --- git -------------------------------------------------------------------------------------------------------
+
+def git(top: Path, *args: str, codes: tuple[int, ...] = (0,)) -> subprocess.CompletedProcess[bytes]:
+    """Run one read-only git command in `top`; any exit code outside `codes` is a GateError."""
+    env = {**os.environ, "GIT_OPTIONAL_LOCKS": "0"}  # a pure read: never refresh or lock the index
+    try:
+        done = subprocess.run(["git", "-c", "core.quotePath=false", *args], cwd=top, capture_output=True,
+                              env=env, timeout=600)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise GateError(f"git could not run: {exc.__class__.__name__}") from exc
+    if done.returncode not in codes:
+        verb = next((a for a in args if not a.startswith("-")), "")
+        raise GateError(f"`git {verb}` exited {done.returncode}")
+    return done
+
+
+def text_of(raw: bytes) -> str:
+    return raw.decode("utf-8", "replace")
+
+
+def work_tree(start: Path) -> Path:
+    done = git(start, "rev-parse", "--show-toplevel", codes=(0, 128))
+    if done.returncode != 0:
+        raise GateError(f"{start.name or start} is not inside a git work tree")
+    return Path(text_of(done.stdout).strip())
+
+
+def object_type(top: Path, sha: str) -> str:
+    done = git(top, "cat-file", "-t", sha, codes=(0, 1, 128))
+    return text_of(done.stdout).strip() if done.returncode == 0 else ""
+
+
+@dataclass
+class Plan:
+    """What one push sends: commits in order, annotated tags, and the ranges gitleaks reads."""
+
+    commits: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    ranges: list[str] = field(default_factory=list)
+    refs: int = 0
+
+
+def parse_updates(text: str) -> list[tuple[str, str, str, str]]:
+    updates = []
+    for n, line in enumerate(text.splitlines(), 1):
+        if not line.strip():
+            continue
+        parts = line.split()
+        if len(parts) != 4 or not SHA.match(parts[1]) or not SHA.match(parts[3]):
+            raise GateError(f"stdin line {n} is not `<local ref> <local sha> <remote ref> <remote sha>`")
+        updates.append((parts[0], parts[1], parts[2], parts[3]))
+    return updates
+
+
+def plan_push(top: Path, updates: list[tuple[str, str, str, str]], remote: str) -> Plan:
+    """The commits and tags the remote does not have yet, per git's ref lines."""
+    plan = Plan()
+    seen: set[str] = set()
+    for _local_ref, local_sha, _remote_ref, remote_sha in updates:
+        plan.refs += 1
+        if ZERO_SHA.match(local_sha):
+            continue  # a deletion sends nothing
+        kind = object_type(top, local_sha)
+        if kind == "tag":
+            plan.tags.append(local_sha)
+        elif kind != "commit":
+            raise GateError(f"a pushed ref points at a {kind or 'missing object'}; the gate checks commits and tags")
+        tip = f"{local_sha}^{{commit}}"
+        if not ZERO_SHA.match(remote_sha) and object_type(top, remote_sha) == "commit":
+            spec = [f"{remote_sha}..{tip}"]
+        elif remote:
+            spec = [tip, "--not", f"--remotes={remote}"]
+        else:
+            spec = [tip]
+        plan.ranges.append(" ".join(spec))
+        for sha in text_of(git(top, "rev-list", "--reverse", *spec).stdout).split():
+            if sha not in seen:
+                seen.add(sha)
+                plan.commits.append(sha)
+    return plan
+
+
+def split_object(raw: str) -> tuple[list[str], list[str]]:
+    """(header lines, message lines) of a commit or tag object; a signature block is not part of the message."""
+    head, _, body = raw.partition("\n\n")
+    headers = [line for line in head.splitlines() if not line.startswith(" ")]  # continuation lines: signatures
+    message = body.split("-----BEGIN PGP SIGNATURE-----", 1)[0].split("-----BEGIN SSH SIGNATURE-----", 1)[0]
+    return headers, message.splitlines()
+
+
+def parents(top: Path, sha: str) -> list[str]:
+    return text_of(git(top, "rev-list", "--parents", "-n", "1", sha).stdout).split()[1:]
+
+
+def changed_files(top: Path, sha: str, base: str | None) -> list[tuple[str, bool]]:
+    """(path, is binary) of every file the commit adds or changes, against its first parent."""
+    pair = [base, sha] if base else ["--root", sha]
+    raw = git(top, "diff-tree", *DIFF_OPTIONS, "-z", "--numstat", *pair).stdout
+    out = []
+    for record in raw.split(b"\0"):
+        if not record:
+            continue
+        added, _deleted, path = text_of(record).split("\t", 2)
+        out.append((path, added == "-"))
+    return out
+
+
+def added_lines(top: Path, sha: str, base: str | None, path: str | None = None) -> list[list[tuple[int, str]]]:
+    """Per patch section, in the order of `changed_files`: (line number in the new file, added text).
+
+    Without `path` there is one section per changed file, except that a type change (a file becoming a link)
+    prints two; `check_commit` then asks again file by file, with `path` set.
+    """
+    pair = [base, sha] if base else ["--root", sha]
+    only = ["--", path] if path is not None else []
+    raw = text_of(git(top, "--literal-pathspecs", "diff-tree", *DIFF_OPTIONS, "-p", "-U0", "--src-prefix=a/",
+                      "--dst-prefix=b/", *pair, *only).stdout)
+    files: list[list[tuple[int, str]]] = []
+    in_header, number = True, 0
+    for line in raw.splitlines():
+        if line.startswith("diff --git "):
+            files.append([])
+            in_header = True
+            continue
+        if not files:
+            continue
+        match = HUNK.match(line)
+        if match:
+            in_header, number = False, int(match.group(1))
+            continue
+        if in_header:
+            continue
+        if line.startswith("+"):
+            files[-1].append((number, line[1:]))
+            number += 1
+    return files
+
+
+# --- the scanner -----------------------------------------------------------------------------------------------
+
+def scanner():
+    """This checkout's scanner module, else the other package's identical copy."""
+    src = REPO / "src"
+    own = [d.name for d in sorted(src.iterdir()) if (d / "__init__.py").is_file()] if src.is_dir() else []
+    if src.is_dir() and str(src) not in sys.path:
+        sys.path.insert(0, str(src))
+    for name in [*own, *(p for p in PACKAGES if p not in own)]:
+        try:
+            return importlib.import_module(f"{name}._common.privacy")
+        except ModuleNotFoundError:
+            continue
+    raise GateError("the scanner module is missing from src/; install the checkout or run tools/sync_common.py")
+
+
+@dataclass
+class Lists:
+    """The prepared lists of one run."""
+
+    privacy: object
+    matcher: object
+    private_only: object
+    allows: list
+    message_allows: list
+    identities: set[tuple[str, str]]
+    sizes: tuple[int, int, int]
+
+
+def parse_identity(value: str) -> tuple[str, str]:
+    match = IDENTITY.match(value)
+    if not match or not match.group("name"):
+        raise GateError(f"--identity needs the form \"Name <e-mail>\"; got {len(value)} character(s) that are not")
+    return match.group("name").strip(), match.group("email").strip().lower()
+
+
+def load_lists(words: Path | None, identities: list[str], top: Path, trailers: Sequence[str] = ()) -> Lists:
+    if words is None:
+        raise GateError("no private word list; pass --words <file> (tools/install-hooks.py writes it into the hook)")
+    words = Path(words).expanduser()
+    if not words.is_file():
+        raise GateError("the private word list is missing or not a file; fix the path given to --words")
+    if words.resolve().is_relative_to(top.resolve()):
+        raise GateError("the private word list lies inside the repository; keep it outside every clone")
+    if not identities:
+        raise GateError("no allowed identity; pass --identity \"Name <e-mail>\" with the identity your pushed "
+                        "commits carry, for example the GitHub noreply address")
+    allowed = {parse_identity(value) for value in identities}
+    privacy = scanner()
+    try:
+        public = privacy.load_public_patterns(DATA / privacy.PATTERNS_FILE)
+        private = privacy.load_private_words(words)
+        allow_file = DATA / privacy.ALLOW_FILE
+        allows = privacy.load_allowlist(allow_file) if allow_file.is_file() else []
+    except privacy.PrivacyError as exc:
+        raise GateError(str(exc)) from exc
+    except ImportError as exc:
+        raise GateError(f"this interpreter lacks a module the scanner needs: {exc.name}") from exc
+    emails = sorted({email for _, email in allowed} | {t.strip().lower() for t in trailers if t.strip()})
+    message_allows = [a for a in allows if not a.paths] + [
+        privacy.Allow(text=email, why="an allowed identity's or trailer's e-mail in a message",
+                      kept=re.compile(re.escape(unicodedata.normalize("NFKC", email)), re.IGNORECASE),
+                      folded=re.compile(re.escape(privacy.fold(email))), patterns=("email",))
+        for email in emails]
+    return Lists(privacy=privacy, matcher=privacy.Matcher.build([*public, *private]),
+                 private_only=privacy.Matcher.build(private), allows=allows, message_allows=message_allows,
+                 identities=allowed, sizes=(len(public), len(private), len(allows)))
+
+
+# --- checking --------------------------------------------------------------------------------------------------
+
+@dataclass
+class Report:
+    """Hits as (commit, place, category); the matched text is never kept."""
+
+    hits: list[tuple[str, str, str]] = field(default_factory=list)
+
+    def add(self, commit: str, place: str, category: str) -> None:
+        self.hits.append((commit[:12], place, category))
+
+
+def path_allows(lists: Lists, rel: str) -> list:
+    if rel.split("/")[0] == "tests":
+        return []  # nothing under tests/ is ever excused
+    return [a for a in lists.allows if a.applies_to_path(rel)]
+
+
+def check_lines(lists: Lists, report: Report, commit: str, place: str, lines, allows, explain: bool) -> None:
+    for number, line in lines:
+        if not line:
+            continue
+        for pattern in lists.privacy.line_hits(line, lists.matcher, allows):
+            report.add(commit, f"{place}:{number}" if explain and number else place, pattern.id)
+
+
+def check_people(lists: Lists, report: Report, sha: str, headers: list[str]) -> None:
+    for header in headers:
+        match = PERSON_LINE.match(header)
+        if not match:
+            continue
+        role, name, email = match.group("role"), match.group("name").strip(), match.group("email").strip()
+        if (name, email.lower()) not in lists.identities:
+            report.add(sha, role, "identity-not-allowed")
+        if match.group("tz") != UTC_OFFSET:  # a missing or unreadable date counts as not UTC (fail closed)
+            report.add(sha, role, "date-not-utc")
+        for pattern in lists.privacy.line_hits(f"{name} <{email}>", lists.private_only):
+            report.add(sha, role, pattern.id)
+
+
+def check_commit(top: Path, lists: Lists, report: Report, sha: str, explain: bool) -> None:
+    headers, message = split_object(text_of(git(top, "cat-file", "commit", sha).stdout))
+    check_people(lists, report, sha, headers)
+    check_lines(lists, report, sha, "message", list(enumerate(message, 1)), lists.message_allows, explain)
+    first = (parents(top, sha) or [None])[0]
+    files = changed_files(top, sha, first)
+    patches = added_lines(top, sha, first)
+    if len(files) != len(patches):  # a type change prints two sections for one file: ask file by file
+        patches = [[line for section in added_lines(top, sha, first, rel) for line in section] for rel, _ in files]
+    for (rel, binary), lines in zip(files, patches, strict=True):
+        allows = path_allows(lists, rel)
+        for pattern in lists.privacy.line_hits(rel, lists.matcher, allows, path=True):
+            report.add(sha, rel, pattern.id)
+        if binary:
+            report.add(sha, rel, "binary-file")
+            continue
+        check_lines(lists, report, sha, rel, lines, allows, explain)
+
+
+def check_tag(top: Path, lists: Lists, report: Report, sha: str, explain: bool) -> None:
+    headers, message = split_object(text_of(git(top, "cat-file", "tag", sha).stdout))
+    check_people(lists, report, sha, headers)
+    check_lines(lists, report, sha, "tag message", list(enumerate(message, 1)), lists.message_allows, explain)
+
+
+def run_gitleaks(top: Path, plan: Plan, report: Report) -> str:
+    """Run gitleaks over the pushed ranges; returns `ran` or `absent`. A gitleaks failure is a GateError."""
+    exe = shutil.which("gitleaks")
+    if exe is None:
+        return "absent"
+    for spec in plan.ranges:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "gitleaks.json"
+            try:
+                done = subprocess.run([exe, "detect", "--source", str(top), "--log-opts", spec, "--redact",
+                                       "--no-banner", "--exit-code", "1", "--report-format", "json",
+                                       "--report-path", str(out)], capture_output=True, timeout=900)
+            except (OSError, subprocess.SubprocessError) as exc:
+                raise GateError(f"gitleaks could not run: {exc.__class__.__name__}") from exc
+            if done.returncode not in (0, 1):
+                raise GateError(f"gitleaks exited {done.returncode}; run it by hand, or push with --no-gitleaks "
+                                f"after reading why")
+            try:
+                findings = json.loads(out.read_text(encoding="utf-8") or "[]") if out.is_file() else []
+            except (OSError, ValueError):
+                findings = []
+            if done.returncode == 1 and not findings:
+                findings = [{}]
+            for finding in findings:
+                report.add(str(finding.get("Commit") or "gitleaks"), str(finding.get("File") or "history"),
+                           f"gitleaks:{finding.get('RuleID') or 'finding'}")
+    return "ran"
+
+
+# --- output and record -----------------------------------------------------------------------------------------
+
+def counts(counter: Counter) -> str:
+    return ", ".join(f"{name} {n}" for name, n in sorted(counter.items()))
+
+
+def print_report(report: Report, plan: Plan) -> None:
+    by_place: dict[tuple[str, str], Counter] = {}
+    for commit, place, category in report.hits:
+        by_place.setdefault((commit, place), Counter())[category] += 1
+    for (commit, place), counter in by_place.items():
+        print(f"  {commit} {place}: {counts(counter)}")
+    if report.hits:
+        print(f"by category: {counts(Counter(c for _, _, c in report.hits))}")
+    checked = len(plan.commits) + len(plan.tags)
+    if report.hits:
+        bad = len({commit for commit, _, _ in report.hits})
+        if any(category == "date-not-utc" for _, _, category in report.hits):
+            print("date-not-utc: commit in UTC: set TZ=UTC (or GIT_AUTHOR_DATE and GIT_COMMITTER_DATE ending in "
+                  "+0000), then amend or rebase those commits")
+        print(f"pre-push gate: {len(report.hits)} hit(s) in {bad} of {checked} commit(s) and tag(s); push refused. "
+              f"Rewrite those commits (amend or rebase), then push again; --explain prints file:line.")
+    else:
+        print(f"pre-push gate: 0 hit(s) in {checked} commit(s) and tag(s) on {plan.refs} ref(s); push allowed")
+
+
+def record(top: Path, line: str) -> None:
+    """Append one line to the gate's log inside the git dir; a failure to log is reported, never fatal."""
+    try:
+        git_dir = Path(text_of(git(top, "rev-parse", "--absolute-git-dir").stdout).strip())
+        stamp = datetime.now().astimezone().isoformat(timespec="seconds")
+        with open(git_dir / LOG_NAME, "a", encoding="utf-8") as handle:
+            handle.write(f"{stamp} {line}\n")
+    except (GateError, OSError):
+        print("note: the gate could not write its log line", file=sys.stderr)
+
+
+# --- main ------------------------------------------------------------------------------------------------------
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="pre-push-gate", description=__doc__.split("\n\n")[0])
+    parser.add_argument("remote", nargs="?", default="",
+                        help="the remote's name as git passes it; the gate never contacts the remote")
+    parser.add_argument("url", nargs="?", default="", help="the remote's URL as git passes it; unused, never printed")
+    parser.add_argument("--words", type=Path, metavar="FILE",
+                        help="the private word list, kept outside every repository; required")
+    parser.add_argument("--identity", action="append", default=[], metavar="'NAME <E-MAIL>'",
+                        help="an author and committer identity allowed in pushed commits; repeat for several")
+    parser.add_argument("--trailer-email", action="append", default=[], metavar="E-MAIL",
+                        help="an e-mail address excused in commit messages only, for example a co-author trailer")
+    parser.add_argument("--no-gitleaks", action="store_true",
+                        help="skip gitleaks; a warning is printed and the log records it")
+    parser.add_argument("--explain", action="store_true", help="also print file:line per hit, never the matched text")
+    parser.add_argument("--repo", type=Path, metavar="DIR",
+                        help="the clone to check; default: the current folder, where git runs hooks")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    top: Path | None = None
+    try:
+        top = work_tree(args.repo or Path.cwd())
+        lists = load_lists(args.words, args.identity, top, args.trailer_email)
+        if sys.stdin is None or sys.stdin.isatty():
+            raise GateError("no ref lines on stdin; git passes them, and by hand pipe one line: "
+                            "<local ref> <local sha> <remote ref> <remote sha>")
+        plan = plan_push(top, parse_updates(text_of(sys.stdin.buffer.read())), args.remote)
+        report = Report()
+        for sha in plan.commits:
+            check_commit(top, lists, report, sha, args.explain)
+        for sha in plan.tags:
+            check_tag(top, lists, report, sha, args.explain)
+        if args.no_gitleaks:
+            leaks = "skipped"
+            print("warning: gitleaks skipped (--no-gitleaks); the gate log records it", file=sys.stderr)
+        else:
+            leaks = run_gitleaks(top, plan, report)
+            if leaks == "absent":
+                print("warning: gitleaks is not on PATH, so the secret-pattern scan did not run; install it, or "
+                      "pass --no-gitleaks to say so explicitly", file=sys.stderr)
+    except GateError as exc:
+        print(f"gate cannot run: {exc}", file=sys.stderr)
+        if top is not None:
+            record(top, "result=cannot-run")
+        return EXIT_CANNOT_RUN
+    print_report(report, plan)
+    result = "refused" if report.hits else "allowed"
+    record(top, f"refs={plan.refs} commits={len(plan.commits)} tags={len(plan.tags)} hits={len(report.hits)} "
+                f"gitleaks={leaks} result={result}")
+    return EXIT_REFUSED if report.hits else EXIT_ALLOWED
+
+
+if __name__ == "__main__":
+    sys.exit(main())

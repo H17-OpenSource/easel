@@ -1,0 +1,58 @@
+# Example of easel/family/1 (synthetic: demo_robot, 2030).
+schema: easel/family/1
+id: demo_xl
+name: Demo XL
+status: listed
+inherits: null
+architecture:
+  kind: unet-sdxl
+  latent_channels: 4
+  text_encoders:
+  - clip-l
+  - clip-g
+  native_resolution: 1024
+description: a synthetic family for the schema example
+licence_summary:
+  status: unverified
+  name: null
+  text: 'unverified: read the model card'
+  url: https://example.invalid/demo-xl
+host_ram_gb:
+  train: null
+  eval: 8.5
+  eval_includes_comfyui_server: true
+  basis: a prior for the example, not measured
+inference:
+  basis: 'prior: community defaults'
+  graph_compiler: sdxl_txt2img
+  sampler: dpmpp_2m
+  scheduler: karras
+  steps: 30
+  cfg: 6.0
+  clip_skip: 1
+  resolution:
+    native:
+    - 1024
+    - 1024
+    presets:
+      portrait:
+      - 832
+      - 1216
+  prompt:
+    style: natural
+    prefix: ''
+    suffix: ''
+    order: <prefix><trigger>, <class word>, <scene>, <style tags>
+    notes: ''
+  negative_baseline: lowres, blurry, watermark
+  lora_default_weight: 0.8
+  hires:
+    scale: 1.5
+    denoise: 0.4
+    steps: 15
+    mode: latent
+  vae:
+    shared_with:
+    - sdxl
+    not_interchangeable_with:
+    - sd15

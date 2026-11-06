@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:run:1",
+  "title": "one render run",
+  "description": "<home>/runs/<run-id>/run.json, written at queue time and updated as the run moves; graph.json (the compiled API graph) and manifest.json sit beside it, outputs in outputs/NNN.png addressed (run, n). `easel runs import-legacy` writes one from a host run with legacy_id set.",
+  "x-file": "<home>/runs/<run-id>/run.json",
+  "x-owner": "tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "created_at",
+    "status",
+    "count",
+    "prompt",
+    "graph",
+    "outputs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/run/1",
+      "description": "the format and its version; always the first key"
+    },
+    "id": {
+      "$ref": "#/$defs/run_id"
+    },
+    "legacy_id": {
+      "$ref": "#/$defs/legacy_id"
+    },
+    "recipe": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/rcp_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "workflow": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "job": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/job_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "$ref": "#/$defs/ts"
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "running",
+        "ok",
+        "failed",
+        "oom",
+        "cancelled"
+      ]
+    },
+    "prompt_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "ComfyUI's prompt id"
+    },
+    "seed": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "negative": {
+      "type": "string"
+    },
+    "width": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 64
+    },
+    "height": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 64
+    },
+    "steps": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "cfg": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "sampler": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scheduler": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "denoise": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "started_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "finished_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "duration_s": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "gpu_peak_mb": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "graph": {
+      "$ref": "#/$defs/relpath"
+    },
+    "manifest": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/relpath"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "n",
+          "file",
+          "sha256"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "file": {
+            "$ref": "#/$defs/relpath"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/sha256"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "seed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "metadata_stripped": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "files relative to the run folder"
+    },
+    "imported_from": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "manifest"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "legacy"
+              ]
+            },
+            "manifest": {
+              "type": "string",
+              "description": "the host manifest's path relative to adopt.output_root"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "legacy": {
+      "$ref": "#/$defs/legacy"
+    }
+  },
+  "$defs": {
+    "job_id": {
+      "type": "string",
+      "pattern": "^job-\\d{8}-\\d{3}$",
+      "description": "a job id: job-YYYYMMDD-NNN"
+    },
+    "legacy": {
+      "type": "object",
+      "description": "fields of an imported record that this format has no place for yet, kept verbatim by the import; tools ignore this block"
+    },
+    "legacy_id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "description": "records imported from another store keep their original id in legacy_id; null for records made here. It lets an imported record be traced back and is never shown in public text"
+    },
+    "rcp_id": {
+      "type": "string",
+      "pattern": "^rcp-\\d{8}-\\d{3}$",
+      "description": "a recipe id: rcp-YYYYMMDD-NNN"
+    },
+    "relpath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$",
+      "description": "a path relative to the root its record names: forward slashes, no drive, no leading slash, no `..`"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^run-\\d{8}-[a-z0-9][a-z0-9_-]*$",
+      "description": "a run id: run-YYYYMMDD-<slug>, for example run-20300101-001"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "lower-case hex sha256 of the file bytes"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    }
+  }
+}

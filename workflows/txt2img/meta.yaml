@@ -1,0 +1,18 @@
+# The shipped workflow template `txt2img` (easel/workflow-meta/1); checked by `easel workflows check`.
+schema: easel/workflow-meta/1
+id: txt2img
+name: txt2img with core nodes
+legacy_id: null
+domain: image
+task: txt2img
+status: draft
+family: sdxl
+comfyui_min_version: 0.43.0
+node_packs: []
+files:
+  graph: graph.json
+  slots: slots.json
+validated_at: null
+validator_note: null
+approved_at: null
+notes: 'Core ComfyUI nodes only: checkpoint, two prompts, one sampler pass, save.'

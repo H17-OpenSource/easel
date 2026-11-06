@@ -1,0 +1,71 @@
+schema: easel/resource/1
+id: 99134ef8d78fb1bb
+legacy_id: null
+identity:
+  type: upscaler
+  file_name: demo-4x.safetensors
+  path: upscale_models/demo-4x.safetensors
+  family: null
+  base_model_label: null
+  title: Demo 4x upscaler
+provenance:
+  source_class: downloaded
+  site: huggingface
+  url: https://example.invalid/models/demo-4x
+  download_url: null
+  author: demo_author
+  model_id: null
+  version_id: null
+  upstream_revision: null
+  downloaded_at: '2030-01-01T02:05:00+00:00'
+  status: partial
+  record: null
+  trained_by: null
+integrity:
+  sha256: 99134ef8d78fb1bbdee2b8e27054e04b610f8166ccaeecf40caaf8a08770898d
+  bytes: 294
+  tensor_count: 3
+  param_count: 3
+  dtypes:
+  - F16
+  precision: fp16
+  quantization: none
+  hashed_at: '2030-01-01T03:00:00+00:00'
+lora: null
+semantics:
+  description: null
+  category: null
+  tags:
+  - demo
+  content:
+    rating: sfw
+    class: sfw
+    basis: source
+licence:
+  status: unverified
+  name: Demo Open Licence
+  spdx: null
+  url: https://example.invalid/licences/demo-open
+  commercial_use: images
+  credit_required: true
+  derivatives_allowed: true
+  relicense_allowed: false
+  redistributable: true
+  gated: false
+  source: civitai-api
+  checked_at: '2030-01-01'
+  note: null
+when_to_use: null
+usage:
+  card: null
+  author_notes: null
+relations: []
+lifecycle:
+  install_status: active
+  tested_at: null
+  test_verdict: null
+  favorite: false
+  notes: null
+  created_at: '2030-01-01T03:00:00+00:00'
+  updated_at: '2030-01-01T03:00:00+00:00'
+  scanned_at: '2030-01-01T03:00:00+00:00'

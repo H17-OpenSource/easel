@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:candidates-entry:1",
+  "title": "one vetted search result",
+  "description": "One line of <home>/candidates/<date>.jsonl, written by `easel search vet <url>`: what the public API says about a model version and the class it falls into. `registry add` takes an ok row into pending/.",
+  "x-file": "<home>/candidates/<date>.jsonl",
+  "x-owner": "tool",
+  "x-kind": "event-line",
+  "type": "object",
+  "required": [
+    "schema",
+    "at",
+    "v",
+    "source",
+    "site",
+    "url",
+    "model_id",
+    "name",
+    "type",
+    "rating",
+    "licence",
+    "class",
+    "reasons"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/candidates-entry/1",
+      "description": "the format and its version; always the first key"
+    },
+    "at": {
+      "$ref": "#/$defs/ts"
+    },
+    "v": {
+      "const": 1,
+      "description": "the line format's version: the number at the end of `schema`, so a reader can branch without parsing the string"
+    },
+    "source": {
+      "$ref": "#/$defs/who"
+    },
+    "by": {
+      "$ref": "#/$defs/by"
+    },
+    "site": {
+      "enum": [
+        "civitai",
+        "huggingface"
+      ]
+    },
+    "url": {
+      "$ref": "#/$defs/url"
+    },
+    "query": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "model_id": {
+      "type": "string"
+    },
+    "version_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "checkpoint",
+        "lora",
+        "lycoris",
+        "vae",
+        "text_encoder",
+        "clip",
+        "clip_vision",
+        "controlnet",
+        "ipadapter",
+        "upscaler",
+        "embedding",
+        "detector",
+        "sam",
+        "style_model",
+        "unet",
+        "model_patch",
+        "other"
+      ]
+    },
+    "family": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/family_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "base_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "file_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "sha256": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rating": {
+      "$ref": "#/$defs/rating"
+    },
+    "licence": {
+      "$ref": "#/$defs/licence"
+    },
+    "class": {
+      "enum": [
+        "ok",
+        "licence-unclear",
+        "rating-conflict",
+        "gated",
+        "too-big"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "one line per reason the class was given"
+    }
+  },
+  "$defs": {
+    "by": {
+      "type": "string",
+      "minLength": 1,
+      "description": "the command that wrote the line, for example `kiln images label` (optional)"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "a date, YYYY-MM-DD"
+    },
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    },
+    "licence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "description": "a model's licence terms as read from its source. Read by `registry audit`, `recipe propose --explain`, `kiln train plan` (copied into run.json) and `kiln release build` (which refuses when status is unknown, derivatives_allowed is false, or relicense_allowed is false while the LoRA's licence differs). null in a field = not known",
+      "properties": {
+        "status": {
+          "enum": [
+            "verified",
+            "unverified",
+            "unknown"
+          ],
+          "description": "verified = a person read the licence text; unverified = taken from site metadata; unknown = nothing known yet"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the licence's name as its source gives it"
+        },
+        "spdx": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "SPDX id when one exists, for example Apache-2.0"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/url"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commercial_use": {
+          "enum": [
+            "none",
+            "images",
+            "rent",
+            "sell",
+            null
+          ],
+          "description": "Civitai allowCommercialUse mapped: none | images | rent | sell"
+        },
+        "credit_required": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Civitai allowNoCredit inverted"
+        },
+        "derivatives_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Civitai allowDerivatives"
+        },
+        "relicense_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Civitai allowDifferentLicense"
+        },
+        "redistributable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "gated": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "true = downloading needs a login or an accepted form"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "where the terms come from: civitai-api | hf-card | model-card | manual | family-summary"
+        },
+        "checked_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "$ref": "#/$defs/date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "rating": {
+      "enum": [
+        "sfw",
+        "suggestive",
+        "explicit",
+        "unknown"
+      ],
+      "description": "content rating; unknown is treated as not sfw (policy.unknown_rating_is)"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "lower-case hex sha256 of the file bytes"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://",
+      "description": "an http(s) URL"
+    },
+    "who": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*(:[^\\s].*)?$",
+      "description": "where the line's content comes from: `operator` (the person), the second source (policy.second_source_name, default `assistant`), or a tool, for example `kiln:images import` or `easel:workflows validate`"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easel"
+dynamic = ["version"]
+description = "An agent-friendly, file-based workflow for finding models, writing recipes and rendering images with ComfyUI."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "H17 - OpenSource"}]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "pyyaml",
+    "pillow",
+    "jsonschema",
+    "tomli-w",
+]
+
+[project.optional-dependencies]
+# pip-licenses >= 5.0 understands the PEP 639 `license = "MIT"` expression (older versions report UNKNOWN).
+dev = ["pytest", "ruff", "pip-licenses>=5.0"]
+# Not declared yet: [references]. It arrives with the references task, which fills it with real, pinned
+# packages; an empty extra would only advertise something that does not exist.
+
+[project.urls]
+Homepage = "https://github.com/H17-OpenSource/easel"
+Repository = "https://github.com/H17-OpenSource/easel"
+Issues = "https://github.com/H17-OpenSource/easel/issues"
+
+[project.scripts]
+easel = "easel.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "easel.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+    "gpu: needs a CUDA GPU; never runs in CI",
+    "machine: needs a real, configured machine (processes, local installs); never runs in CI",
+    "comfy_live: needs a running ComfyUI server; never runs in CI",
+    "net: needs network access; never runs in CI",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["tests/fixtures/_gen"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]

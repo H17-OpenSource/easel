@@ -1,0 +1,71 @@
+schema: easel/resource/1
+id: bbbabeef2c0d57fe
+legacy_id: null
+identity:
+  type: checkpoint
+  file_name: demo-anime-xl.safetensors
+  path: checkpoints/demo-anime-xl.safetensors
+  family: illustrious
+  base_model_label: Illustrious XL
+  title: Demo Anime XL
+provenance:
+  source_class: downloaded
+  site: civitai
+  url: null
+  download_url: https://civitai.com/api/download/models/9000000102
+  author: demo_author
+  model_id: '9000000101'
+  version_id: '9000000102'
+  upstream_revision: '9000000102'
+  downloaded_at: '2030-01-01T02:01:00+00:00'
+  status: verified
+  record: null
+  trained_by: null
+integrity:
+  sha256: bbbabeef2c0d57fee02bdbe3dde478d4dd7b29cc8aef5f8b2b5af3cb22d671df
+  bytes: 536
+  tensor_count: 4
+  param_count: 4
+  dtypes:
+  - F16
+  precision: fp16
+  quantization: none
+  hashed_at: '2030-01-01T03:00:00+00:00'
+lora: null
+semantics:
+  description: null
+  category: null
+  tags:
+  - demo
+  content:
+    rating: sfw
+    class: sfw
+    basis: source
+licence:
+  status: unverified
+  name: Demo Open Licence
+  spdx: null
+  url: https://example.invalid/licences/demo-open
+  commercial_use: images
+  credit_required: true
+  derivatives_allowed: true
+  relicense_allowed: false
+  redistributable: true
+  gated: false
+  source: civitai-api
+  checked_at: '2030-01-01'
+  note: null
+when_to_use: null
+usage:
+  card: null
+  author_notes: registry/resources/bbbabeef2c0d57fe.usage.yaml
+relations: []
+lifecycle:
+  install_status: active
+  tested_at: '2030-01-01T12:00:00+00:00'
+  test_verdict: kept
+  favorite: false
+  notes: null
+  created_at: '2030-01-01T03:00:00+00:00'
+  updated_at: '2030-01-01T03:00:00+00:00'
+  scanned_at: '2030-01-01T03:00:00+00:00'

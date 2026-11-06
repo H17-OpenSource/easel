@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:reference-resources:1",
+  "title": "the resources a reference used",
+  "description": "<home>/references/<source>/<source-id>/resources.yaml: every LoRA, embedding or checkpoint the reference names, normalised and resolved against the registry where possible.",
+  "x-file": "<home>/references/<source>/<source-id>/resources.yaml",
+  "x-owner": "tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "reference",
+    "resources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/reference-resources/1",
+      "description": "the format and its version; always the first key"
+    },
+    "reference": {
+      "type": "string",
+      "pattern": "^[a-z]+:[0-9A-Za-z_-]+$"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "ordinal",
+          "role",
+          "resolved"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "ordinal": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "role": {
+            "enum": [
+              "checkpoint",
+              "model",
+              "lora",
+              "lycoris",
+              "embed",
+              "embedding",
+              "vae",
+              "upscaler",
+              "other",
+              null
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "the site's short hash, prefix-matched"
+          },
+          "weight": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "model_version_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model_version_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolved": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "enum": [
+                  "resolved",
+                  "unresolved",
+                  "ambiguous"
+                ]
+              },
+              "model_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "resource": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/sha16"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha16": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "a resource id: the first 16 hex digits of the file's sha256"
+    }
+  }
+}

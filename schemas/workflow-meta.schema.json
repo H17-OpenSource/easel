@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:workflow-meta:1",
+  "title": "a workflow template's facts",
+  "description": "workflows/<id>/meta.yaml beside graph.json (the ComfyUI API graph) and slots.json. Every node pack the graph needs is named with its licence; a template whose packs are missing is unavailable, never silently degraded.",
+  "x-file": "workflows/<id>/meta.yaml",
+  "x-owner": "maintainers / person",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "domain",
+    "task",
+    "status",
+    "node_packs",
+    "files"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/workflow-meta/1",
+      "description": "the format and its version; always the first key"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "legacy_id": {
+      "$ref": "#/$defs/legacy_id"
+    },
+    "domain": {
+      "enum": [
+        "image",
+        "video",
+        "upscale"
+      ]
+    },
+    "task": {
+      "enum": [
+        "txt2img",
+        "img2img",
+        "inpaint",
+        "upscale",
+        "detail",
+        "i2v",
+        "t2v"
+      ]
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "approved",
+        "archived"
+      ]
+    },
+    "family": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/family_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "comfyui_min_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "node_packs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "licence",
+          "required"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "licence": {
+            "type": "string",
+            "description": "SPDX id, or unverified"
+          },
+          "commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/url"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "installs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "licence"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "licence": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "description": "custom node packs the graph needs; empty = core nodes only"
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "graph",
+        "slots"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "graph": {
+          "$ref": "#/$defs/relpath"
+        },
+        "slots": {
+          "$ref": "#/$defs/relpath"
+        }
+      }
+    },
+    "validated_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "validator_note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "approved_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$defs": {
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    },
+    "legacy_id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "description": "records imported from another store keep their original id in legacy_id; null for records made here. It lets an imported record be traced back and is never shown in public text"
+    },
+    "relpath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$",
+      "description": "a path relative to the root its record names: forward slashes, no drive, no leading slash, no `..`"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://",
+      "description": "an http(s) URL"
+    }
+  }
+}

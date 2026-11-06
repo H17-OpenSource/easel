@@ -1,0 +1,40 @@
+# Where model files live under {models_root}: ComfyUI's own models/ layout. `easel registry scan` reads a
+# file's type from the folder its path starts with; `comfyui_folders` lists, per ComfyUI folder name, the
+# folders under {models_root} that feed it, and `type_folders` names the ComfyUI folder each resource type
+# loads from (a folder shared by two types, such as loras/, means the first type listed; the scan then
+# reads the header to tell a LyCORIS from a LoRA). An instance with another layout puts its own copy in
+# <home>/data/folders.yaml, which replaces this file.
+schema: easel/folders/1
+base_path: '{models_root}'
+comfyui_folders:
+  checkpoints: [checkpoints]
+  loras: [loras]
+  vae: [vae]
+  text_encoders: [text_encoders, clip]
+  diffusion_models: [diffusion_models, unet]
+  clip_vision: [clip_vision]
+  controlnet: [controlnet, t2i_adapter]
+  embeddings: [embeddings]
+  upscale_models: [upscale_models]
+  style_models: [style_models]
+  model_patches: [model_patches]
+  ipadapter: [ipadapter]        # the IP-Adapter node pack's folder
+  ultralytics: [ultralytics]    # detector models (bbox/, segm/) of the detailer node packs
+  sams: [sams]                  # segment-anything models of the detailer node packs
+type_folders:
+  checkpoint: checkpoints
+  lora: loras
+  lycoris: loras
+  vae: vae
+  text_encoder: text_encoders
+  clip: text_encoders
+  clip_vision: clip_vision
+  controlnet: controlnet
+  ipadapter: ipadapter
+  upscaler: upscale_models
+  embedding: embeddings
+  detector: ultralytics
+  sam: sams
+  style_model: style_models
+  unet: diffusion_models
+  model_patch: model_patches

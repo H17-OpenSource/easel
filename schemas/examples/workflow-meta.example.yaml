@@ -1,0 +1,34 @@
+# Example of easel/workflow-meta/1 (synthetic: demo_robot, 2030).
+schema: easel/workflow-meta/1
+id: txt2img-detailer
+name: txt2img with a face detailer pass
+legacy_id: null
+domain: image
+task: detail
+status: draft
+family: sdxl
+comfyui_min_version: 0.43.0
+node_packs:
+- name: ComfyUI-Impact-Pack
+  licence: GPL-3.0
+  commit: null
+  url: null
+  required: true
+  installs: []
+  note: FaceDetailer
+- name: ComfyUI-Impact-Subpack
+  licence: AGPL-3.0
+  commit: null
+  url: null
+  required: true
+  installs:
+  - name: ultralytics
+    licence: AGPL-3.0
+  note: the detector provider; installs ultralytics into the user's ComfyUI
+files:
+  graph: graph.json
+  slots: slots.json
+validated_at: null
+validator_note: null
+approved_at: null
+notes: 'unavailable without both packs: driven over HTTP only, never imported or vendored'

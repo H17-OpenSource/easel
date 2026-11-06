@@ -1,0 +1,14 @@
+schema: "privacy/allow/1"
+# Exceptions to the privacy scan, each with its reason. An entry excuses a hit only where the matched span lies
+# inside an occurrence of `text` on the same line (compared after the same decoding, NFKC and casefolding as
+# the scan). Optional `paths` (globs on the repository-relative path, forward slashes) limit where it applies;
+# optional `patterns` (pattern ids from public-patterns.yaml, or `private`) limit which hits it may excuse.
+# Nothing under tests/ is ever excused: the scanner ignores this file for paths that start with tests/.
+# Add an entry only with a `why` a reviewer can check; never loosen a pattern to make a scan pass.
+
+allow:
+  - text: "127.0.0.1:8188"
+    why: ComfyUI's public default address, used in the README and the example config; the host's own ports
+      belong on the private word list.
+  # The handle in LICENSE, CODEOWNERS and the README attribution is added at C0, limited to those paths, once
+  # the handle exists. SPDX licence ids need no entry today: no public pattern matches one.

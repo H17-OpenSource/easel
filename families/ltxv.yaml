@@ -1,0 +1,37 @@
+# Model family `ltxv` (LTX-Video). Public model-family facts only.
+# Shared keys (every top-level key except `schema`, `inference` and `training`) are identical in
+# the easel and kiln copies of this file; `tools/sync_common.py --check` compares them.
+# `inherits`: a block this file leaves out is read from the parent family (the child's keys win).
+# `basis` says where a number comes from: measured on the reference machine, or a prior.
+# `inference`: easel's render defaults for this family.
+
+schema: easel/family/1
+id: ltxv
+name: LTX-Video
+status: listed
+inherits: null
+architecture:
+  kind: dit-video
+  latent_channels: 128
+  text_encoders: [t5xxl]
+  native_resolution: 768
+description: Video DiT, high latent channel count.
+licence_summary:
+  status: unverified
+  name: null
+  text: 'unverified: read the model card'
+  url: https://huggingface.co/Lightricks/LTX-Video
+# host_ram_gb: eval not measured, so whether it includes the ComfyUI server is not recorded.
+host_ram_gb:
+  train: null
+  eval: null
+  eval_includes_comfyui_server: null
+  basis: not measured
+inference:
+  graph_compiler: null
+  note: No graph template ships for this family yet.
+  resolution:
+    native: [768, 768]
+  vae:
+    shared_with: []
+    not_interchangeable_with: []

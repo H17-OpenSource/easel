@@ -1,0 +1,92 @@
+schema: easel/resource/1
+id: cf56db17414bcb55
+legacy_id: null
+identity:
+  type: lora
+  file_name: demo_robot-v1.safetensors
+  path: loras/demo_robot-v1.safetensors
+  family: illustrious
+  base_model_label: Illustrious XL
+  title: Demo Robot v1
+provenance:
+  source_class: self-trained
+  site: local-train
+  url: null
+  download_url: null
+  author: null
+  model_id: null
+  version_id: null
+  upstream_revision: null
+  downloaded_at: null
+  status: not-applicable
+  record: null
+  trained_by:
+    tool: kiln
+    project: demo_robot
+    run: run-20300102-001
+    checkpoint_step: 800
+    snapshot: demo_robot/0.2.0
+integrity:
+  sha256: cf56db17414bcb553eafe194951eefdb54abe08f14fa6f04fbe044bb3ff51abc
+  bytes: 574
+  tensor_count: 3
+  param_count: 3
+  dtypes:
+  - F16
+  precision: fp16
+  quantization: none
+  hashed_at: '2030-01-01T03:00:00+00:00'
+lora:
+  network_dim: 32
+  network_alpha: 32
+  network_module: networks.lora
+  lora_type: standard
+  trained_on_family: illustrious
+  trigger_words:
+  - dmrbt
+  recommended_weight:
+    min: 0.7
+    max: 0.9
+  clip_skip: 2
+semantics:
+  description: the demo subject, trained with kiln
+  category: character
+  tags:
+  - demo
+  content:
+    rating: sfw
+    class: sfw
+    basis: manual
+licence:
+  status: verified
+  name: Demo LoRA Licence
+  spdx: null
+  url: null
+  commercial_use: images
+  credit_required: true
+  derivatives_allowed: true
+  relicense_allowed: false
+  redistributable: true
+  gated: false
+  source: manual
+  checked_at: '2030-01-05'
+  note: chosen by the person at release time
+when_to_use:
+  summary: the demo robot on Illustrious checkpoints
+  good_for:
+  - demo_robot
+  avoid:
+  - 'SDXL base: the visor goes soft'
+usage:
+  card: standards/cards/cf56db17414bcb55.yaml
+  author_notes: null
+relations: []
+lifecycle:
+  install_status: active
+  tested_at: '2030-01-01T12:00:00+00:00'
+  test_verdict: kept
+  favorite: true
+  notes: null
+  created_at: '2030-01-01T03:00:00+00:00'
+  updated_at: '2030-01-01T06:00:00+00:00'
+  scanned_at: '2030-01-01T03:00:00+00:00'

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:workflow-slots:1",
+  "title": "the fillable inputs of a workflow graph",
+  "description": "workflows/<id>/slots.json: each slot names one node input of graph.json that a recipe fills.",
+  "x-file": "workflows/<id>/slots.json",
+  "x-owner": "maintainers",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "workflow",
+    "slots"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/workflow-slots/1",
+      "description": "the format and its version; always the first key"
+    },
+    "workflow": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "node",
+          "input",
+          "kind",
+          "required"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.]*$"
+          },
+          "node": {
+            "type": "string",
+            "description": "the node id in graph.json"
+          },
+          "input": {
+            "type": "string",
+            "description": "the input name on that node"
+          },
+          "kind": {
+            "enum": [
+              "text",
+              "int",
+              "float",
+              "bool",
+              "choice",
+              "resource",
+              "image"
+            ]
+          },
+          "role": {
+            "enum": [
+              "checkpoint",
+              "lora",
+              "lycoris",
+              "embedding",
+              "vae",
+              "upscaler",
+              "controlnet",
+              "ipadapter",
+              "clip",
+              "text_encoder",
+              "detector",
+              null
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "default": {},
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

@@ -1,0 +1,59 @@
+name: "Model family"
+description: "Add or correct a model family file: families/<id>.yaml."
+title: "[model-family] <id>: <one line>"
+labels: ["model-family"]
+body:
+  - type: markdown
+    attributes:
+      value: "A family file says what a base architecture needs and under which licence its base models ship. Every number needs a source and a date. Leave out private values: no absolute paths (write `<home>`, `<models_root>`), no names or account names, no tokens, no ids of your own records, and no description of any image. Vulnerabilities do not belong here: see SECURITY.md."
+  - type: input
+    id: family_id
+    attributes:
+      label: "family id"
+      description: "lowercase, as the file name: families/<id>.yaml"
+    validations:
+      required: true
+  - type: textarea
+    id: inherits
+    attributes:
+      label: "base and inheritance"
+      description: "the family it inherits from, if any; a family that inherits still carries its own licence summary"
+    validations:
+      required: true
+  - type: textarea
+    id: licence
+    attributes:
+      label: "licence summary"
+      description: "the base models' licence name and the URL of its text; say plainly when it is unverified"
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: "host RAM and VRAM"
+      description: "host_ram_gb for the work this tool does, with the hardware and the date it was measured"
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: "sources"
+      description: "where each fact comes from: model cards, licence pages, your own measurement"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "acceptance criteria"
+      description: "Written before the work starts: each one a command and the literal line it prints, or a test that passes. The pull request is judged against exactly these."
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Checks"
+      options:
+        - label: "`easel families check` passes on the proposed file, and the keys shared with kiln agree (tools/sync_common.py --check)."
+          required: false
+        - label: "I removed private values: no absolute paths, names, account names, tokens or ids of my own records, and no images."
+          required: true

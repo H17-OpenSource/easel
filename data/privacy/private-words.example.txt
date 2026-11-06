@@ -1,0 +1,27 @@
+# Private word list: the example. It holds the category headings only and no values.
+# Copy it OUTSIDE every repository and outside any synced or backed-up folder you share, fill one value per line
+# under each heading, and point the scanner at your copy: `[privacy] wordlist` in your instance TOML, the
+# <TOOL>_PRIVACY__WORDLIST environment variable, or `<tool> privacy scan --words <file>`.
+#
+# Format:
+# - one literal per line, matched case-insensitively as a substring after NFKC normalisation;
+# - a line that starts with "re:" is a Python regular expression, matched case-insensitively;
+# - blank lines and lines that start with "#" are ignored; each value is reported under the nearest heading
+#   above it (so keep values out of the headings);
+# - the scanner prints counts per heading and file, never a value;
+# - `<tool> privacy scan --harvest-sql <file.sql> --db <file>` appends the strings your own SELECT statements
+#   return below the harvested marker at the end of this file; keep that marker the last heading.
+# Write each value in every form it can take: with and without separators, percent-encoded, abbreviated.
+# Id shapes (a prefix and a number pattern) fit better as regexes in an extra-patterns file; see
+# public-patterns.yaml for its format and `[privacy] extra_patterns` for where to name it.
+
+# people: names in every spelling, e-mail addresses and their local parts
+# machine: operating-system user names, machine names, host ports other than the public defaults (re: lines)
+# folders: workspace, install, sync and backup folder names, with and without separators, percent-encoded
+# accounts: account and handle names on code, model and image sites
+# project names: project, experiment and codenames, other projects on the machine, environment-variable prefixes
+# subject terms: subject names, trigger tokens and the words and phrases that describe your subjects
+# published ids: model, version and image ids of your uploads, reference ids, spec and suite names
+# file names: your own model, data and review file names, as re: lines when they carry dates
+
+# --- harvested ---

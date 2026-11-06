@@ -1,0 +1,139 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "demo-anime-xl.safetensors"
+    },
+    "_meta": {
+      "title": "checkpoint"
+    }
+  },
+  "2": {
+    "class_type": "CLIPSetLastLayer",
+    "inputs": {
+      "stop_at_clip_layer": -2,
+      "clip": [
+        "1",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "clip skip 2"
+    }
+  },
+  "3": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "demo_robot-v1.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 0.8,
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "lora.1"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "dmrbt, robot, standing in a tidy workshop, soft daylight, full body",
+      "clip": [
+        "3",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "positive"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "lowres, blurry, text, watermark",
+      "clip": [
+        "3",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "negative"
+    }
+  },
+  "6": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1216,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "latent"
+    }
+  },
+  "7": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 1001,
+      "steps": 28,
+      "cfg": 5.5,
+      "sampler_name": "euler_ancestral",
+      "scheduler": "normal",
+      "denoise": 1.0,
+      "model": [
+        "3",
+        0
+      ],
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "sampler"
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "7",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "decode"
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "easel/run-20300101-001/001",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "save base"
+    }
+  }
+}

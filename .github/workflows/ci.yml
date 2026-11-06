@@ -1,0 +1,101 @@
+# CI: lint, the offline tests and every gate, on Linux and Windows; a separate job scans the git history for
+# secrets with a pinned gitleaks. No GPU, no model download, no ComfyUI. The same checks run locally before a
+# pull request (CONTRIBUTING.md, "What a change has to meet").
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Ruff
+        run: python -m ruff check .
+      - name: Tests (offline markers only)
+        run: python -m pytest -q -m "not gpu and not machine and not comfy_live and not net"
+      - name: Privacy scan (public patterns)
+        run: python tools/privacy_check.py --public .
+      - name: Generated docs are current (STUCK.md, formats.md, pitfall.yml)
+        run: python tools/gen_formats_doc.py --check
+      - name: Shipped data checks
+        run: |
+          python -m easel families check
+          python -m easel workflows check
+      # The licence gate. --allow-only lists every licence string the maintainers reviewed, verbatim: pip-licenses
+      # compares whole strings, so a PEP 639 expression such as "Apache-2.0 OR BSD-2-Clause" is one entry. A new
+      # dependency with an unlisted licence fails here until someone reads its licence and adds the string in a
+      # pull request. tests/test_licence_gate.py reads this step and proves that it fails on a GPL package.
+      - name: Licence gate (pip-licenses, allow-only)
+        run: >-
+          python -m piplicenses --from=mixed --ignore-packages easel kiln pip setuptools
+          --allow-only "MIT;MIT License;MIT-CMU;BSD License;BSD-2-Clause;BSD-3-Clause;
+          Apache-2.0;Apache Software License;Apache-2.0 OR BSD-2-Clause;
+          BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0;PSF-2.0;Python Software Foundation License;
+          ISC License (ISCL);Historical Permission Notice and Disclaimer (HPND);Mozilla Public License 2.0 (MPL 2.0)"
+      - name: Every .json file parses
+        run: >-
+          python -c "import json, subprocess;
+          files = subprocess.run(['git', 'ls-files', '*.json'], capture_output=True, text=True, check=True).stdout.split();
+          [json.loads(open(f, encoding='utf-8').read()) for f in files];
+          print(len(files), 'json file(s) parse')"
+      # The sibling repository, after the licence gate (which covers this repository's dependencies only): its
+      # shared code must match ours, and once it is installed `qa docs` checks the kiln commands these docs show
+      # against kiln's own CLI instead of counting them as not checked.
+      - name: Sibling repository (clone and install)
+        run: |
+          git clone --depth 1 "https://github.com/${{ github.repository_owner }}/kiln" "$RUNNER_TEMP/kiln"
+          python -m pip install -e "$RUNNER_TEMP/kiln"
+      - name: Shared code matches the sibling repository
+        run: python tools/sync_common.py --check --sibling "$RUNNER_TEMP/kiln"
+      - name: Docs QA (commands, planned markers, paths, sections, output dates)
+        run: python -m easel qa docs
+      - name: Agent rules QA (AGENTS.md and the host files)
+        run: python -m easel qa agents
+      - name: Test layout QA (every file defines a test, unique file names)
+        run: python -m easel qa tests
+
+  secrets:
+    runs-on: ubuntu-latest
+    env:
+      # The pinned gitleaks release and the sha256 of its linux x64 archive, both taken by a maintainer from that
+      # release's own checksums file and reviewed in the pull request that changes them (ADR-0002). An empty
+      # sha256 fails the job: the scan never runs an unverified binary.
+      GITLEAKS_VERSION: "8.18.4"
+      GITLEAKS_SHA256: "ba6dbb656933921c775ee5a2d1c13a91046e7952e9d919f9bac4cec61d628e7d"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks (pinned version, sha256 verified)
+        run: |
+          set -euo pipefail
+          if [ -z "$GITLEAKS_SHA256" ]; then
+            echo "gitleaks pin incomplete: set GITLEAKS_SHA256 in this workflow to the sha256 of gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz from that release's checksums file"
+            exit 1
+          fi
+          archive="$RUNNER_TEMP/gitleaks.tar.gz"
+          curl -sSfL -o "$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  ${archive}" | sha256sum --check --strict
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          echo "$RUNNER_TEMP/gitleaks" >> "$GITHUB_PATH"
+      - name: Secret scan (gitleaks, whole history)
+        run: gitleaks detect --source . --redact --no-banner

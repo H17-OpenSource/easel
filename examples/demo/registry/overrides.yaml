@@ -1,0 +1,9 @@
+# The person's corrections; `easel registry scan` applies them on top of what it reads.
+schema: easel/overrides/1
+resources:
+  cf56db17414bcb55:
+    set:
+      provenance.source_class: self-trained
+      semantics.category: character
+    note: trained with kiln, project demo_robot
+    at: '2030-01-01T06:00:00+00:00'

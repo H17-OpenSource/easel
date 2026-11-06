@@ -1,0 +1,864 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:resource:1",
+  "title": "a model file in the registry",
+  "description": "One file per model file, registry/resources/<sha16>.yaml, written by `easel registry scan` and the registry verbs. A pending download (no file yet) lives in registry/pending/<source>-<model>-<version>.yaml with id null and lifecycle.install_status pending. The person's own corrections go into registry/overrides.yaml, never into this file.",
+  "x-file": "<home>/registry/resources/<sha16>.yaml",
+  "x-owner": "tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "identity",
+    "provenance",
+    "integrity",
+    "semantics",
+    "licence",
+    "lifecycle"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/resource/1",
+      "description": "the format and its version; always the first key"
+    },
+    "id": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha16"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "<sha256[:16]>, equal to the file stem; null only while the file has no hash yet (a pending download, or a file found but not hashed; such records live in registry/pending/)"
+    },
+    "legacy_id": {
+      "$ref": "#/$defs/legacy_id"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "type",
+        "file_name",
+        "path",
+        "family"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "checkpoint",
+            "lora",
+            "lycoris",
+            "vae",
+            "text_encoder",
+            "clip",
+            "clip_vision",
+            "controlnet",
+            "ipadapter",
+            "upscaler",
+            "embedding",
+            "detector",
+            "sam",
+            "style_model",
+            "unet",
+            "model_patch"
+          ]
+        },
+        "file_name": {
+          "type": "string",
+          "description": "the exact on-disk name; never renamed"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "relative to paths.models_root; null while pending"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/family_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "base_model_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "a human label, for example 'Illustrious XL 1.0'"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the model's title at its source"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source_class",
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source_class": {
+          "enum": [
+            "downloaded",
+            "self-trained",
+            "merged",
+            "unknown"
+          ]
+        },
+        "site": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z][a-z0-9.-]*$",
+          "description": "civitai | huggingface | local-train | github | ... (lower case)"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/url"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "download_url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/url"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the creator's handle at the source"
+        },
+        "model_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the site's model id"
+        },
+        "version_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the site's version id"
+        },
+        "upstream_revision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "git sha, HF commit or site version"
+        },
+        "downloaded_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "verified",
+            "partial",
+            "unverified",
+            "not-applicable"
+          ]
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "the filtered raw API record, relative to the registry folder (registry/provenance/<sha16>.json)"
+        },
+        "trained_by": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": [
+                "tool",
+                "project",
+                "run"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "tool": {
+                  "type": "string"
+                },
+                "project": {
+                  "$ref": "#/$defs/slug"
+                },
+                "run": {
+                  "$ref": "#/$defs/run_id"
+                },
+                "checkpoint_step": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 0
+                },
+                "snapshot": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/snapshot_id"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "required": [
+        "sha256",
+        "bytes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "tensor_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "param_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "dtypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "precision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "fp16 | fp32 | bf16 | fp8"
+        },
+        "quantization": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "for example GGUF-Q4_K_M, nf4 or none"
+        },
+        "hashed_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "lora": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "network_dim": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "network_alpha": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "network_module": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lora_type": {
+              "enum": [
+                "standard",
+                "loha",
+                "lokr",
+                "dora",
+                null
+              ]
+            },
+            "trained_on_family": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/family_id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "trigger_words": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "one entry per trigger word or phrase"
+            },
+            "recommended_weight": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "min",
+                    "max"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "clip_skip": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "semantics": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the person's own words"
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "style | character | concept | utility | anatomy"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content": {
+          "type": "object",
+          "required": [
+            "rating",
+            "class"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "rating": {
+              "$ref": "#/$defs/rating"
+            },
+            "class": {
+              "enum": [
+                "sfw",
+                "nsfw",
+                "unknown"
+              ]
+            },
+            "basis": {
+              "enum": [
+                "source",
+                "markers",
+                "manual",
+                "default"
+              ],
+              "description": "default = nothing known, so default-deny applies"
+            }
+          }
+        }
+      }
+    },
+    "licence": {
+      "$ref": "#/$defs/licence"
+    },
+    "when_to_use": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "good_for": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "avoid": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "card": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "standards/cards/<sha16>.yaml"
+        },
+        "author_notes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/relpath"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "the <sha16>.usage.yaml beside this file"
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "relation",
+          "to"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "relation": {
+            "enum": [
+              "duplicate_of",
+              "supersedes",
+              "derived_from",
+              "variant_of",
+              "replaces"
+            ]
+          },
+          "to": {
+            "$ref": "#/$defs/sha16"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "required": [
+        "install_status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "install_status": {
+          "enum": [
+            "active",
+            "staged",
+            "pending",
+            "quarantined",
+            "broken",
+            "archived",
+            "missing"
+          ]
+        },
+        "tested_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "test_verdict": {
+          "enum": [
+            "kept",
+            "rejected",
+            "needs-work",
+            null
+          ]
+        },
+        "favorite": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scanned_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "legacy": {
+      "$ref": "#/$defs/legacy"
+    }
+  },
+  "if": {
+    "properties": {
+      "id": {
+        "type": "null"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "integrity": {
+        "properties": {
+          "sha256": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "integrity": {
+        "properties": {
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "a date, YYYY-MM-DD"
+    },
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    },
+    "legacy": {
+      "type": "object",
+      "description": "fields of an imported record that this format has no place for yet, kept verbatim by the import; tools ignore this block"
+    },
+    "legacy_id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "description": "records imported from another store keep their original id in legacy_id; null for records made here. It lets an imported record be traced back and is never shown in public text"
+    },
+    "licence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "description": "a model's licence terms as read from its source. Read by `registry audit`, `recipe propose --explain`, `kiln train plan` (copied into run.json) and `kiln release build` (which refuses when status is unknown, derivatives_allowed is false, or relicense_allowed is false while the LoRA's licence differs). null in a field = not known",
+      "properties": {
+        "status": {
+          "enum": [
+            "verified",
+            "unverified",
+            "unknown"
+          ],
+          "description": "verified = a person read the licence text; unverified = taken from site metadata; unknown = nothing known yet"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the licence's name as its source gives it"
+        },
+        "spdx": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "SPDX id when one exists, for example Apache-2.0"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/url"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commercial_use": {
+          "enum": [
+            "none",
+            "images",
+            "rent",
+            "sell",
+            null
+          ],
+          "description": "Civitai allowCommercialUse mapped: none | images | rent | sell"
+        },
+        "credit_required": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Civitai allowNoCredit inverted"
+        },
+        "derivatives_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Civitai allowDerivatives"
+        },
+        "relicense_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Civitai allowDifferentLicense"
+        },
+        "redistributable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "gated": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "true = downloading needs a login or an accepted form"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "where the terms come from: civitai-api | hf-card | model-card | manual | family-summary"
+        },
+        "checked_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ts"
+            },
+            {
+              "$ref": "#/$defs/date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "rating": {
+      "enum": [
+        "sfw",
+        "suggestive",
+        "explicit",
+        "unknown"
+      ],
+      "description": "content rating; unknown is treated as not sfw (policy.unknown_rating_is)"
+    },
+    "relpath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$",
+      "description": "a path relative to the root its record names: forward slashes, no drive, no leading slash, no `..`"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^run-\\d{8}-[a-z0-9][a-z0-9_-]*$",
+      "description": "a run id: run-YYYYMMDD-<slug>, for example run-20300101-001"
+    },
+    "sha16": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "a resource id: the first 16 hex digits of the file's sha256"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "lower-case hex sha256 of the file bytes"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a project slug, for example demo_robot"
+    },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*/\\d+\\.\\d+\\.\\d+$",
+      "description": "a dataset snapshot id: <slug>/<version>"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://",
+      "description": "an http(s) URL"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+schema: easel/resource/1
+id: 85306657134cbde8
+legacy_id: null
+identity:
+  type: checkpoint
+  file_name: demo-base-xl.safetensors
+  path: checkpoints/demo-base-xl.safetensors
+  family: sdxl
+  base_model_label: SDXL 1.0
+  title: Demo Base XL
+provenance:
+  source_class: downloaded
+  site: huggingface
+  url: https://example.invalid/models/demo-base-xl
+  download_url: null
+  author: demo_author
+  model_id: null
+  version_id: null
+  upstream_revision: null
+  downloaded_at: '2030-01-01T02:00:00+00:00'
+  status: partial
+  record: null
+  trained_by: null
+integrity:
+  sha256: 85306657134cbde86114ef1986153dc503ac0ac3beeb367b8888699db5b0edc2
+  bytes: 536
+  tensor_count: 4
+  param_count: 4
+  dtypes:
+  - F16
+  precision: fp16
+  quantization: none
+  hashed_at: '2030-01-01T03:00:00+00:00'
+lora: null
+semantics:
+  description: null
+  category: null
+  tags:
+  - demo
+  content:
+    rating: sfw
+    class: sfw
+    basis: source
+licence:
+  status: unverified
+  name: Demo Open Licence
+  spdx: null
+  url: https://example.invalid/licences/demo-open
+  commercial_use: images
+  credit_required: true
+  derivatives_allowed: true
+  relicense_allowed: false
+  redistributable: true
+  gated: false
+  source: civitai-api
+  checked_at: '2030-01-01'
+  note: null
+when_to_use: null
+usage:
+  card: null
+  author_notes: null
+relations: []
+lifecycle:
+  install_status: active
+  tested_at: null
+  test_verdict: null
+  favorite: false
+  notes: null
+  created_at: '2030-01-01T03:00:00+00:00'
+  updated_at: '2030-01-01T03:00:00+00:00'
+  scanned_at: '2030-01-01T03:00:00+00:00'

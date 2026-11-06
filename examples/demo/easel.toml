@@ -1,0 +1,60 @@
+# The easel demo instance: six fake model files, one recipe, one run with reviews, one reference, dated 2030.
+# Its media and model files are not committed: `python tests/fixtures/make_fixtures.py --place <a copy of this
+# folder> --demo easel` generates them (the test fixture demo_workspace does this for every test).
+schema = "easel/config/1"
+
+[instance]
+name = "demo"
+adopted = false
+
+[paths]
+root = "."
+models_root = "models"
+runs = "runs"
+recipes = "recipes"
+registry = "registry"
+journal = "journal"
+runtime = "runtime"
+
+[comfyui]
+url = "http://127.0.0.1:8188"
+dir = ""
+python = ""
+min_version = "0.43.0"
+manage_lifecycle = false
+start_args = []                 # optional ComfyUI flags and when each helps: see easel.example.toml
+
+[limits]
+host_ram_floor_gb = 2.0
+disk_floor_gb = 20
+max_concurrent_gpu_jobs = 1
+
+[scheduler]
+kind = "none"
+fail_open = false
+
+[jobs]
+allowed = [{tool = "easel", verb = "run", pausable = false}]
+
+[registry]
+backend = "files"
+
+[review]
+bind = "127.0.0.1"
+port = 8742
+
+[policy]
+reviewer = "human-only"
+prompt_authoring = "sfw-only"
+unknown_rating_is = "nsfw"
+second_source_name = "assistant"
+render = "native"
+subjects = "fictional-adults-only"
+
+[privacy]
+wordlist = ""
+headless = true
+
+[adopt]
+
+[env_aliases]

@@ -1,0 +1,65 @@
+{
+  "schema": "easel/recipe/1",
+  "id": "rcp-20300101-001",
+  "legacy_id": null,
+  "created_at": "2030-01-01T09:00:00+00:00",
+  "name": "demo robot in the workshop",
+  "status": "run",
+  "task": "txt2img",
+  "family": "illustrious",
+  "checkpoint": "bbbabeef2c0d57fe",
+  "workflow": null,
+  "prompt": "dmrbt, robot, standing in a tidy workshop, soft daylight, full body",
+  "negative": "lowres, blurry, text, watermark",
+  "params": {
+    "sampler": "euler_ancestral",
+    "scheduler": "normal",
+    "steps": 28,
+    "cfg": 5.5,
+    "width": 832,
+    "height": 1216,
+    "clip_skip": 2,
+    "seed": 1001,
+    "count": 4,
+    "denoise": 1.0,
+    "hires": {
+      "mode": "none"
+    }
+  },
+  "resources": [
+    {
+      "role": "checkpoint",
+      "resource": "bbbabeef2c0d57fe",
+      "slot": "",
+      "weight": null,
+      "reason": "the Illustrious checkpoint the LoRA was trained on"
+    },
+    {
+      "role": "lora",
+      "resource": "cf56db17414bcb55",
+      "slot": "lora.1",
+      "weight": 0.8,
+      "reason": "the usage card's chosen weight"
+    }
+  ],
+  "policy": {
+    "prompt_authoring": "sfw-only",
+    "subjects": "fictional-adults-only"
+  },
+  "content_class": "sfw",
+  "request": {
+    "kind": "propose",
+    "text": "four renders of the demo robot in its workshop, full body",
+    "from_recipe": null,
+    "from_run": null,
+    "from_output": null
+  },
+  "rationale": {
+    "checkpoint": "native compat for the LoRA (data/compat.yaml)",
+    "sampler": "the family default (families/illustrious.yaml)",
+    "hires": "none: the 8x8 demo renders need no second pass"
+  },
+  "parent": null,
+  "approved_at": "2030-01-01T09:30:00+00:00",
+  "notes": null
+}

@@ -1,0 +1,37 @@
+# Model family `wan22` (WAN 2.2). Public model-family facts only.
+# Shared keys (every top-level key except `schema`, `inference` and `training`) are identical in
+# the easel and kiln copies of this file; `tools/sync_common.py --check` compares them.
+# `inherits`: a block this file leaves out is read from the parent family (the child's keys win).
+# `basis` says where a number comes from: measured on the reference machine, or a prior.
+# `inference`: easel's render defaults for this family.
+
+schema: easel/family/1
+id: wan22
+name: WAN 2.2
+status: listed
+inherits: wan21
+architecture:
+  kind: dit-video
+  latent_channels: 48
+  text_encoders: [umt5-xxl]
+  native_resolution: 832
+description: Video DiT, different VAE channel count from 2.1. VAEs are NOT interchangeable.
+licence_summary:
+  status: unverified
+  name: null
+  text: 'unverified: read the model card'
+  url: https://huggingface.co/Wan-AI/Wan2.2-T2V-A14B
+# host_ram_gb: eval not measured, so whether it includes the ComfyUI server is not recorded.
+host_ram_gb:
+  train: null
+  eval: null
+  eval_includes_comfyui_server: null
+  basis: not measured
+inference:
+  graph_compiler: null
+  note: No graph template ships for this family yet.
+  resolution:
+    native: [832, 832]
+  vae:
+    shared_with: []
+    not_interchangeable_with: [wan21]

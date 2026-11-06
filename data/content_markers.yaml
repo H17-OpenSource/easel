@@ -1,0 +1,66 @@
+# Generic cue words, matched case-insensitively as whole words (file-name separators such as _ - . count as spaces): an sfw or non-sfw cue in a resource's name, title or tags moves its rating off the default "unknown" (which counts as not sfw; non-sfw wins when both appear, and a cue never overrides a rating from the source or the person), and any third-list term in a prompt is refused under policy.subjects = "fictional-adults-only".
+sfw_cues:
+  - sfw
+  - safe for work
+  - family friendly
+  - all ages
+  - general audience
+non_sfw_cues:
+  - nsfw
+  - not safe for work
+  - explicit
+  - nude
+  - nudity
+  - naked
+  - uncensored
+  - lewd
+  - hentai
+  - porn
+  - pornographic
+  - erotic
+  - xxx
+  - r18
+  - r 18
+  - 18+
+age_down_and_real_person_cues:
+  - child
+  - children
+  - kid
+  - kids
+  - toddler
+  - infant
+  - underage
+  - under age
+  - preteen
+  - pre teen
+  - teen
+  - teens
+  - teenager
+  - young girl
+  - young boy
+  - little girl
+  - little boy
+  - schoolgirl
+  - schoolboy
+  - elementary school
+  - middle school
+  - loli
+  - lolita
+  - shota
+  - age down
+  - aged down
+  - age regression
+  - real person
+  - real people
+  - real life person
+  - celebrity
+  - celebrities
+  - famous person
+  - public figure
+  - politician
+  - lookalike
+  - look alike
+  - deepfake
+  - face swap
+  - faceswap
+  - likeness of

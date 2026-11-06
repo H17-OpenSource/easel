@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:reference-note-event:1",
+  "title": "a note on a reference",
+  "description": "One line of <home>/references/<source>/<source-id>/notes.jsonl: the person's answer to \"why did you save this?\" first (kind why), then other notes; an assistant summary is kind ai-summary with source = the second source and never replaces the person's words.",
+  "x-file": "<home>/references/<source>/<source-id>/notes.jsonl",
+  "x-owner": "person",
+  "x-kind": "event-line",
+  "type": "object",
+  "required": [
+    "schema",
+    "at",
+    "v",
+    "source",
+    "reference",
+    "kind",
+    "body"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/reference-note-event/1",
+      "description": "the format and its version; always the first key"
+    },
+    "at": {
+      "$ref": "#/$defs/ts"
+    },
+    "v": {
+      "const": 1,
+      "description": "the line format's version: the number at the end of `schema`, so a reader can branch without parsing the string"
+    },
+    "source": {
+      "$ref": "#/$defs/who"
+    },
+    "by": {
+      "$ref": "#/$defs/by"
+    },
+    "reference": {
+      "type": "string",
+      "pattern": "^[a-z]+:[0-9A-Za-z_-]+$"
+    },
+    "kind": {
+      "enum": [
+        "why",
+        "inspiration",
+        "caveat",
+        "ai-summary"
+      ]
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1
+    },
+    "legacy_id": {
+      "$ref": "#/$defs/legacy_id"
+    }
+  },
+  "$defs": {
+    "by": {
+      "type": "string",
+      "minLength": 1,
+      "description": "the command that wrote the line, for example `kiln images label` (optional)"
+    },
+    "legacy_id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "description": "records imported from another store keep their original id in legacy_id; null for records made here. It lets an imported record be traced back and is never shown in public text"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    },
+    "who": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*(:[^\\s].*)?$",
+      "description": "where the line's content comes from: `operator` (the person), the second source (policy.second_source_name, default `assistant`), or a tool, for example `kiln:images import` or `easel:workflows validate`"
+    }
+  }
+}

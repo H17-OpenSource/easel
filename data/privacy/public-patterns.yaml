@@ -1,0 +1,113 @@
+schema: "privacy/public-patterns/1"
+# The public half of the privacy scan: generic structural shapes that must never leave a machine (paths,
+# e-mail addresses, real-year ids, tokens, placeholders, file types). It names no person, folder or project;
+# those values live only in each user's private word list (see private-words.example.txt), and the id shapes
+# of a user's own records live in an optional extra-patterns file in this same format, kept outside every
+# repository and named by `[privacy] extra_patterns` or `--extra-patterns <file>` (its ids must be new ones).
+#
+# Read by `<tool> privacy scan` and `tools/privacy_check.py`; CI runs it with `--public`. Every regex is Python
+# `re` syntax in a single-quoted YAML string (backslashes are literal; `\x27` stands for a single quote).
+# Keys: `id`, `what`, `regex` and optional `target`. `target: content` (the default) matches every line of a
+# file after decoding (UTF-8/UTF-16, JSON escapes, URL escapes, NFKC; each pattern also sees a casefolded copy);
+# `target: path` matches only the file's repository-relative path (forward slashes) and is for names that must
+# never be committed. (The key is not called `on`: YAML 1.1 reads a bare `on` as the boolean true.)
+#
+# A character class such as `[d]` or `[ ]` in the middle of a word keeps a pattern from matching its own line
+# in this file (the scanner reads this file too, and nothing here is exempt). Keep that trick when you edit.
+# The output names the `id` and counts, never the matched text; exceptions go into allow.yaml with a reason.
+
+patterns:
+  # --- paths and machine locations ---
+  - id: drive-path
+    what: a Windows drive path
+    regex: '(?i)\b[a-z]:[\\/]'
+  - id: drive-path-escaped
+    what: a Windows drive path with doubled backslashes, as JSON or a string literal writes it
+    regex: '(?i)\b[a-z]:\\\\'
+  - id: unc-path
+    what: a network share path
+    regex: '\\\\[A-Za-z0-9._-]+\\[A-Za-z0-9._$-]+'
+  - id: users-folder
+    what: a per-user folder under /Users/
+    regex: '(?i)/users/[a-z0-9._-]+/'
+  - id: home-folder
+    what: a per-user folder under /home/
+    regex: '(?i)/home/[a-z0-9._-]+/'
+  - id: app-data-folder
+    what: a Windows per-user or per-machine application data folder name
+    regex: '(?i)\b(?:app[d]ata|localapp[d]ata|program[d]ata)\b'
+  - id: profile-or-temp-variable
+    what: a user-profile, home or temp-folder variable, or a temp folder in a path
+    regex: '(?i)%user[p]rofile%|\$env:user[p]rofile|\$home[\\/]|\$env:t[e]mp|%t[e]mp%|[\\/]temp[\\/]'
+  - id: file-url
+    what: a local file URL
+    regex: '(?i)\bfile:/{3}'
+  - id: pip-file-reference
+    what: a requirement line that points at a local file, as pip freeze writes for an editable install
+    regex: '(?i)\s@\s*file:'
+  - id: percent-encoded-separator
+    what: a percent-encoded space, backslash or slash, as a local path inside a URL carries
+    regex: '(?i)%(?:20|5c|2f)'
+  - id: numbered-folder
+    what: a numbered workspace folder shape, two digits, an underscore and a name, followed by a separator
+    regex: '(?<![\w-])\d{2}_[a-z_]+[\\/]'
+  - id: cloud-sync-brand
+    what: a cloud-sync service name, which usually comes with a synced local path
+    regex: '(?i)\b(?:one[d]rive|i[c]loud|google ?drive|box\.com|mega\.nz)\b'
+
+  # --- people and accounts ---
+  - id: email
+    what: an e-mail address
+    regex: '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
+  - id: secret-assignment
+    what: a key, token, secret or password assigned a long value
+    regex: '(?i)\b(?:api[_-]?key|access[_-]?token|secret|password|CIVITAI_TOKEN)\b\s*[:=]\s*["\x27]?[A-Za-z0-9_\-]{16,}'
+  - id: hf-token
+    what: a Hugging Face access token
+    regex: '(?i)\bhf_[A-Za-z0-9]{20,}\b'
+  - id: civitai-page-url
+    what: a link to a real model, image, post, user or collection page on Civitai
+    regex: '(?i)\bcivitai\.com/(?:models|images|posts|user|collections)/[A-Za-z0-9]'
+  - id: civitai-private-api
+    what: a Civitai API path outside the public /api/v1/ and /api/download/ endpoints
+    regex: '(?i)\bcivitai\.com/api/(?!v1/|download/)'
+
+  # --- id shapes of real records (the demo and the tests use 2030 dates) ---
+  # Only the tools' own id shapes are listed here. The id schemes of the records you keep elsewhere belong in an
+  # extra-patterns file outside every repository (same format; `[privacy] extra_patterns`).
+  - id: real-year-id
+    what: a run, recipe, snapshot, job or decision id dated 2024 to 2029, which only a real record has
+    regex: '\b(?:run|rcp|snap|job|dec)-202[4-9]\d{4}\b'
+
+  # --- unfinished text and leaked output ---
+  - id: placeholder
+    what: an unresolved template placeholder for an insertion, a copyright holder, a handle or the organisation
+    regex: '\[INSER[T] |<COPYRIGHT[ ]HOLDER>|<handl[e]>|<or[g]>'
+  - id: frozen-clock-output
+    what: the frozen-clock warning, which belongs on stderr and never in a document
+    regex: 'clock frozen \((?:KILN|EASEL)_NOW set\)'
+  - id: agpl-import
+    what: an import of a detector or screening package whose licence must stay outside src/
+    regex: '(?i)^\s*(?:import|from)\s+(?:nudenet|ultralytics)\b'
+
+  # --- names that must never be committed (matched against the file's path) ---
+  - id: desktop-ini
+    what: a Windows folder-settings file
+    target: path
+    regex: '(?i)(?:^|/)desktop\.ini$'
+  - id: install-metadata-file
+    what: an install record that holds the local path of a package
+    target: path
+    regex: '(?i)(?:^|/)direct_url\.json$|\.egg-link$'
+  - id: forbidden-file-type
+    what: a database, journal, backup, log, partial download or environment file
+    target: path
+    regex: '(?i)\.(?:db|db-wal|db-shm|db-journal|sqlite|bak|log|part|env)$'
+  - id: weights-file
+    what: a model weights or tensor file
+    target: path
+    regex: '(?i)\.(?:safetensors|ckpt|pt|pth|onnx|gguf|npz|bin)$'
+  - id: media-file
+    what: an image or video file; fixture media are generated into the ignored tests/fixtures/_gen/
+    target: path
+    regex: '(?i)\.(?:png|jpe?g|webp|gif|mp4|webm|mov)$'

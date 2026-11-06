@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:compat:1",
+  "title": "compatibility rules between families",
+  "description": "Which resource type trained on one family works on a checkpoint of another. `easel registry compatible <sha16>` joins it with the registry (a missing rule = untested, confidence 0). Shipped as data/compat.yaml; an instance may add rules in <home>/data/compat.yaml.",
+  "x-file": "data/compat.yaml",
+  "x-owner": "maintainers",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "rules"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/compat/1",
+      "description": "the format and its version; always the first key"
+    },
+    "basis": {
+      "type": "string",
+      "description": "where the rules come from"
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_family",
+          "target_family",
+          "artifact_type",
+          "verdict",
+          "confidence"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_family": {
+            "$ref": "#/$defs/family_id"
+          },
+          "target_family": {
+            "$ref": "#/$defs/family_id"
+          },
+          "artifact_type": {
+            "enum": [
+              "checkpoint",
+              "lora",
+              "lycoris",
+              "vae",
+              "text_encoder",
+              "clip",
+              "clip_vision",
+              "controlnet",
+              "ipadapter",
+              "upscaler",
+              "embedding",
+              "detector",
+              "sam",
+              "style_model",
+              "unet",
+              "model_patch"
+            ]
+          },
+          "verdict": {
+            "enum": [
+              "native",
+              "works",
+              "degraded",
+              "broken",
+              "untested"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    }
+  }
+}

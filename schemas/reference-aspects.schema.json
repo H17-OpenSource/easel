@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:reference-aspects:1",
+  "title": "what a reference is about, as countable aspects",
+  "description": "<home>/references/<source>/<source-id>/aspects.yaml: structured aspects distilled from the notes, which the taste report counts across the collection.",
+  "x-file": "<home>/references/<source>/<source-id>/aspects.yaml",
+  "x-owner": "person / tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "reference",
+    "aspects"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/reference-aspects/1",
+      "description": "the format and its version; always the first key"
+    },
+    "reference": {
+      "type": "string",
+      "pattern": "^[a-z]+:[0-9A-Za-z_-]+$"
+    },
+    "aspects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "aspect",
+          "value",
+          "weight",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "aspect": {
+            "enum": [
+              "character",
+              "pose",
+              "action",
+              "color",
+              "style",
+              "dynamism",
+              "composition",
+              "lighting",
+              "body",
+              "outfit",
+              "camera",
+              "technique",
+              "model",
+              "lora",
+              "other"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "source": {
+            "enum": [
+              "operator",
+              "assistant"
+            ],
+            "description": "who recorded the aspect: `operator`, or the second source (policy.second_source_name)"
+          }
+        }
+      }
+    }
+  }
+}

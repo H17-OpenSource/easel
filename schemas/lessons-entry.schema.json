@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:lessons-entry:1",
+  "title": "one lesson learned",
+  "description": "One line of <home>/lessons/entries.jsonl, written by `lessons add --family --finding --evidence --rule`; docs/lessons/<family>.md is generated from it (Finding | Evidence | Rule | Recorded in). `origin` is where the finding came from (`lessons add --source civitai` sets origin civitai); `source` is who recorded it.",
+  "x-file": "<home>/lessons/entries.jsonl",
+  "x-owner": "person / assistant",
+  "x-kind": "event-line",
+  "type": "object",
+  "required": [
+    "schema",
+    "at",
+    "v",
+    "source",
+    "id",
+    "finding",
+    "evidence",
+    "rule",
+    "origin"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/lessons-entry/1",
+      "description": "the format and its version; always the first key"
+    },
+    "at": {
+      "$ref": "#/$defs/ts"
+    },
+    "v": {
+      "const": 1,
+      "description": "the line format's version: the number at the end of `schema`, so a reader can branch without parsing the string"
+    },
+    "source": {
+      "$ref": "#/$defs/who"
+    },
+    "by": {
+      "$ref": "#/$defs/by"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^les-\\d{8}-\\d{3}$"
+    },
+    "family": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/family_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "topic": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "finding": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rule": {
+      "type": "string",
+      "minLength": 1
+    },
+    "origin": {
+      "enum": [
+        "run",
+        "review",
+        "civitai",
+        "search",
+        "manual"
+      ]
+    },
+    "recorded_in": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "the runbook or doc row the lesson also went into"
+    }
+  },
+  "$defs": {
+    "by": {
+      "type": "string",
+      "minLength": 1,
+      "description": "the command that wrote the line, for example `kiln images label` (optional)"
+    },
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    },
+    "who": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*(:[^\\s].*)?$",
+      "description": "where the line's content comes from: `operator` (the person), the second source (policy.second_source_name, default `assistant`), or a tool, for example `kiln:images import` or `easel:workflows validate`"
+    }
+  }
+}

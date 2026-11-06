@@ -1,0 +1,46 @@
+{
+  "schema": "easel/workflow-slots/1",
+  "workflow": "txt2img-detailer",
+  "slots": [
+    {
+      "name": "checkpoint",
+      "node": "1",
+      "input": "ckpt_name",
+      "kind": "resource",
+      "role": "checkpoint",
+      "required": true,
+      "default": null,
+      "note": null
+    },
+    {
+      "name": "positive",
+      "node": "3",
+      "input": "text",
+      "kind": "text",
+      "role": null,
+      "required": true,
+      "default": null,
+      "note": null
+    },
+    {
+      "name": "seed",
+      "node": "6",
+      "input": "seed",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 0,
+      "note": null
+    },
+    {
+      "name": "detailer.denoise",
+      "node": "9",
+      "input": "denoise",
+      "kind": "float",
+      "role": null,
+      "required": false,
+      "default": 0.4,
+      "note": "FaceDetailer"
+    }
+  ]
+}

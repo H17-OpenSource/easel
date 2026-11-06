@@ -1,0 +1,38 @@
+# The shipped workflow template `detailer` (easel/workflow-meta/1); checked by `easel workflows check`.
+schema: easel/workflow-meta/1
+id: detailer
+name: txt2img with a face detailer pass
+legacy_id: null
+domain: image
+task: detail
+status: draft
+family: sdxl
+comfyui_min_version: 0.43.0
+node_packs:
+- name: ComfyUI-Impact-Pack
+  licence: GPL-3.0
+  commit: 082523b2dbbe0a38282f021ad3a0e33e9f222562
+  url: https://github.com/ltdrdata/ComfyUI-Impact-Pack
+  required: true
+  installs: []
+  note: 'FaceDetailer: the face pass'
+- name: ComfyUI-Impact-Subpack
+  licence: AGPL-3.0
+  commit: 50c7b71a6a224734cc9b21963c6d1926816a97f1
+  url: https://github.com/ltdrdata/ComfyUI-Impact-Subpack
+  required: true
+  installs:
+  - name: ultralytics
+    licence: AGPL-3.0
+  note: 'UltralyticsDetectorProvider: the face detector; installs ultralytics into
+    the user''s ComfyUI'
+files:
+  graph: graph.json
+  slots: slots.json
+validated_at: null
+validator_note: null
+approved_at: null
+notes: Unavailable without both node packs (ComfyUI-Impact-Pack, GPL-3.0; ComfyUI-Impact-Subpack,
+  AGPL-3.0, which installs ultralytics, AGPL-3.0). They are separate programs driven
+  over ComfyUI's HTTP API only, never imported or vendored; the user installs them
+  at the commits in runtime/comfyui.lock.json.

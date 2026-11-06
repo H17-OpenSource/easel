@@ -1,0 +1,52 @@
+# Model family `moss` (MOSS Image). Public model-family facts only.
+# Shared keys (every top-level key except `schema`, `inference` and `training`) are identical in
+# the easel and kiln copies of this file; `tools/sync_common.py --check` compares them.
+# `inherits`: a block this file leaves out is read from the parent family (the child's keys win).
+# `basis` says where a number comes from: measured on the reference machine, or a prior.
+# `inference`: easel's render defaults for this family.
+
+schema: easel/family/1
+id: moss
+name: MOSS Image
+status: experimental
+inherits: null
+architecture:
+  kind: dit
+  latent_channels: null
+  text_encoders: [llm]
+  native_resolution: 1024
+description: 'OpenMOSS MOSS Image: an image model family distinct from SDXL (a DiT with a large-language-model
+  text encoder). LoRAs are family-specific.'
+licence_summary:
+  status: unverified
+  name: Apache-2.0
+  text: 'Apache-2.0 as recorded in earlier notes; unverified: read the model card'
+  url: null
+# host_ram_gb: not measured in this tool yet.
+host_ram_gb:
+  train: null
+  eval: null
+  eval_includes_comfyui_server: null
+  basis: not measured in this tool (experimental family)
+inference:
+  basis: the eval tool's settings for this family on the reference machine (experimental)
+  graph_compiler: moss_txt2img
+  sampler: er_sde
+  scheduler: simple
+  steps: 25
+  cfg: 3.0
+  clip_skip: null
+  resolution:
+    native: [1024, 1024]
+  prompt:
+    style: natural
+    prefix: ''
+    suffix: ''
+    order: <prefix><trigger>, <class word>, <scene>, <style tags>
+    notes: Natural-language prompts (an LLM text encoder); no score tags, no clip skip.
+  negative_baseline: worst quality, bad anatomy, watermark, jpeg artifact
+  hires: null
+  vae:
+    shared_with: []
+    not_interchangeable_with: []
+    note: needs its own text encoder and VAE; see the model card

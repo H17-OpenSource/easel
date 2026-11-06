@@ -1,0 +1,29 @@
+schema: easel/reference-resources/1
+reference: civitai:9000000001
+resources:
+- ordinal: 0
+  role: model
+  name: Demo Anime XL
+  hash: BBBABEEF2C
+  weight: null
+  model_version_id: '9000000102'
+  model_version_name: v1
+  resolved:
+    status: resolved
+    model_id: '9000000101'
+    model_name: Demo Anime XL
+    model_type: Checkpoint
+    resource: bbbabeef2c0d57fe
+- ordinal: 1
+  role: lora
+  name: demo_robot-s800
+  hash: null
+  weight: 0.8
+  model_version_id: null
+  model_version_name: null
+  resolved:
+    status: unresolved
+    model_id: null
+    model_name: null
+    model_type: null
+    resource: null

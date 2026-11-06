@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:job:1",
+  "title": "one scheduled GPU job",
+  "description": "<home>/jobs/<job-id>.json: a GPU job submitted through `easel jobs submit` (or by `easel run`), what it needs and where it stands. Only verbs listed in jobs.allowed are accepted; the scheduler starts it when the family's host_ram_gb and the disk floor hold.",
+  "x-file": "<home>/jobs/<job-id>.json",
+  "x-owner": "tool",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "created_at",
+    "tool",
+    "verb",
+    "args",
+    "host_ram_gb",
+    "minutes",
+    "pausable",
+    "status",
+    "scheduler"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/job/1",
+      "description": "the format and its version; always the first key"
+    },
+    "id": {
+      "$ref": "#/$defs/job_id"
+    },
+    "created_at": {
+      "$ref": "#/$defs/ts"
+    },
+    "tool": {
+      "enum": [
+        "easel",
+        "kiln"
+      ]
+    },
+    "verb": {
+      "type": "string",
+      "pattern": "^[a-z][a-z-]*$"
+    },
+    "args": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "the verb's arguments, for example [rcp-20300101-001]"
+    },
+    "title": {
+      "type": "string"
+    },
+    "by": {
+      "type": "string",
+      "description": "who submitted it: operator or the agent's name"
+    },
+    "family": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/family_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "host_ram_gb": {
+      "type": "number",
+      "description": "free host RAM it waits for",
+      "minimum": 0
+    },
+    "minutes": {
+      "type": "integer",
+      "description": "expected wall clock",
+      "minimum": 1
+    },
+    "pausable": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "waiting",
+        "ready",
+        "running",
+        "yielded",
+        "done",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "scheduler": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "command"
+          ]
+        },
+        "ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the scheduler's own id for the job"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recipe": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rcp_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/run_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "started_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "finished_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "log": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/relpath"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "at",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "$ref": "#/$defs/ts"
+          },
+          "status": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    },
+    "job_id": {
+      "type": "string",
+      "pattern": "^job-\\d{8}-\\d{3}$",
+      "description": "a job id: job-YYYYMMDD-NNN"
+    },
+    "rcp_id": {
+      "type": "string",
+      "pattern": "^rcp-\\d{8}-\\d{3}$",
+      "description": "a recipe id: rcp-YYYYMMDD-NNN"
+    },
+    "relpath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$",
+      "description": "a path relative to the root its record names: forward slashes, no drive, no leading slash, no `..`"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^run-\\d{8}-[a-z0-9][a-z0-9_-]*$",
+      "description": "a run id: run-YYYYMMDD-<slug>, for example run-20300101-001"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$",
+      "description": "ISO 8601 time, for example 2030-01-01T00:00:00+00:00; easel always writes the T and the UTC offset."
+    }
+  }
+}

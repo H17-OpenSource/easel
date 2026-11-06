@@ -1,0 +1,118 @@
+# The rules `easel qa docs|agents|tests` checks. The logic is src/easel/qa.py (the same file in both repos); what
+# differs per repository lives here. Change a rule in the same commit as the docs or code it describes, and never
+# loosen one to make a check pass. Globs are relative to the repository root.
+
+[docs]
+tool = "easel"   # commands that start with this word are checked against the CLI's own --help
+sister = "kiln"   # a path span right after "kiln's" names a file of the sister repository and is not checked
+include = ["*.md", ".github/**/*.md", "docs/**/*.md"]
+exclude = []
+runbooks = ["docs/runbooks/[0-9][0-9]-*.md"]
+adopt_runbooks = ["docs/runbooks/90-*.md"]
+# Fenced lines here are doc output made under the frozen clock: dates from min_year on, never the clock warning.
+# Troubleshooting, lessons and the changelog carry real dated prose and stay outside this scope.
+output_scope = ["docs/runbooks/*.md", "docs/reference/formats.md"]
+sections = [
+    "## 1. Purpose and who decides",
+    "## 2. Entry conditions",
+    "## 3. Commands",
+    "## 4. Expected output",
+    "## 5. Gate and operator question",
+    "## 6. Symptom, cause, action",
+    "## 7. Record",
+]
+output_sections = ["## 4. Expected output"]   # fenced blocks under these headings are output, the rest commands
+entry_section = "## 2. Entry conditions"
+entry_header = "| command | literal line |"
+entry_tools = ["kiln", "easel"]
+pending_marker = "<!-- pending: fixture output -->"
+min_year = 2030
+clock_warning = "clock frozen"
+path_roots = ["docs", "src", "schemas", "families", "types", "tools", "data", "tests", "examples", "runtime", ".github"]
+# Not checked: the generated fixture folder (made at test time, never committed) and paths that exist only in
+# the sister repository (kiln), which an easel doc may name.
+path_ignore = ["tests/fixtures/_gen/", "src/kiln/", "tests/kiln/", "types/"]
+
+# Direct GPU commands that a fenced command line must never show (prose may name them on purpose). `command`
+# matches the first words of the line, `regex` anywhere in it; `unless` names a word that makes the line safe.
+# The list is the same in both repositories: a kiln doc may show an easel line and the other way round.
+[[docs.gpu]]
+command = "kiln train launch"
+why = "training is submitted through the scheduler (runbook 08), never started by an agent"
+[[docs.gpu]]
+command = "kiln train queue run"
+why = "the training queue runs under the scheduler, never from a doc"
+[[docs.gpu]]
+command = "kiln train smoke"
+why = "a smoke run trains on the GPU; it is submitted, never typed"
+[[docs.gpu]]
+command = "kiln train tune"
+why = "tuning trains on the GPU; it is submitted, never typed"
+[[docs.gpu]]
+command = "kiln eval render"
+why = "evaluation renders run as submitted GPU jobs"
+[[docs.gpu]]
+command = "kiln showcase render"
+why = "showcase renders run as submitted GPU jobs"
+[[docs.gpu]]
+command = "kiln source run"
+unless = "--dry-run"
+why = "an image source can render; show it with --dry-run"
+[[docs.gpu]]
+command = "easel run"
+unless = "--dry-run"
+why = "a render is submitted with `easel jobs submit`; `easel run` appears only with --dry-run"
+[[docs.gpu]]
+command = "easel jobs run"
+why = "the job runner belongs to the scheduler"
+[[docs.gpu]]
+command = "easel comfy start"
+why = "the scheduler or the operator starts ComfyUI"
+[[docs.gpu]]
+regex = '\baccelerate\s+launch\b'
+why = "training is submitted through the scheduler"
+[[docs.gpu]]
+regex = '\b(?:sdxl_|flux_|sd3_)?train_network\.py\b'
+why = "the trainer is started by the scheduler, never from a doc"
+[[docs.gpu]]
+regex = '(?:^|[\s/\\])main\.py\b.*--(?:listen|port)\b'
+why = "a ComfyUI server is started by the scheduler or the operator"
+
+# Command lines of an adopt runbook carry placeholders; the concrete values come from the instance config.
+[[docs.adopt_concrete]]
+regex = '(?<![\w.])\d+\.\d+\.\d+(?![\w.])'
+what = "a concrete version"
+[[docs.adopt_concrete]]
+regex = '\b(?:run|rcp|job|snap|dec)-\d{8}-\d{3}\b'
+what = "a concrete record id"
+[[docs.adopt_concrete]]
+regex = '\b[A-Z]{1,5}-\d{3,}\b'
+what = "a host-style record id"
+[[docs.adopt_concrete]]
+regex = '\b[\w-]+\.py\b'
+what = "a host script name (the host's commands are printed from the instance config)"
+[[docs.adopt_concrete]]
+regex = '\b\d{1,3}(?:\.\d{1,3}){3}:\d{2,5}\b'
+what = "a host and port"
+
+[agents]
+file = "AGENTS.md"
+max_lines = 80   # AGENTS.md has fewer lines than this
+parts = [
+    "## 1. What this repo is",
+    "## 2. Read order (cold start)",
+    "## 3. Routing",
+    "## 4. Never",
+    "## 5. When stuck",
+    "## 6. Record",
+    "## 7. Hosts",
+]
+never_section = "## 4. Never"
+never_mentions = ["minor", "real person", "--dry-run", "submitted", "window", "publish", "`date`", "`--help`",
+                  "third time", "disagree", "by hand", "delete"]
+hosts = ["CLAUDE.md", ".github/copilot-instructions.md"]
+host_max_lines = 3
+
+[tests]
+folders = ["tests"]
+pattern = "test_*.py"

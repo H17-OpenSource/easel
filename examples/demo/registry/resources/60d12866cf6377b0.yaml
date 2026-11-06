@@ -1,0 +1,82 @@
+schema: easel/resource/1
+id: 60d12866cf6377b0
+legacy_id: null
+identity:
+  type: lora
+  file_name: demo-style-ink.safetensors
+  path: loras/demo-style-ink.safetensors
+  family: sdxl
+  base_model_label: SDXL 1.0
+  title: Demo Ink Style
+provenance:
+  source_class: downloaded
+  site: civitai
+  url: null
+  download_url: https://civitai.com/api/download/models/9000000202
+  author: demo_author
+  model_id: '9000000201'
+  version_id: '9000000202'
+  upstream_revision: '9000000202'
+  downloaded_at: '2030-01-01T02:02:00+00:00'
+  status: verified
+  record: null
+  trained_by: null
+integrity:
+  sha256: 60d12866cf6377b009fcc6992615440fee4d5960127529737233260ddf30bbe3
+  bytes: 486
+  tensor_count: 3
+  param_count: 3
+  dtypes:
+  - F16
+  precision: fp16
+  quantization: none
+  hashed_at: '2030-01-01T03:00:00+00:00'
+lora:
+  network_dim: 16
+  network_alpha: 8
+  network_module: networks.lora
+  lora_type: standard
+  trained_on_family: sdxl
+  trigger_words:
+  - inkstyle
+  recommended_weight:
+    min: 0.4
+    max: 0.7
+  clip_skip: null
+semantics:
+  description: null
+  category: style
+  tags:
+  - demo
+  content:
+    rating: sfw
+    class: sfw
+    basis: source
+licence:
+  status: unverified
+  name: Demo Open Licence
+  spdx: null
+  url: https://example.invalid/licences/demo-open
+  commercial_use: images
+  credit_required: true
+  derivatives_allowed: true
+  relicense_allowed: false
+  redistributable: true
+  gated: false
+  source: civitai-api
+  checked_at: '2030-01-01'
+  note: null
+when_to_use: null
+usage:
+  card: null
+  author_notes: null
+relations: []
+lifecycle:
+  install_status: active
+  tested_at: null
+  test_verdict: null
+  favorite: false
+  notes: null
+  created_at: '2030-01-01T03:00:00+00:00'
+  updated_at: '2030-01-01T03:00:00+00:00'
+  scanned_at: '2030-01-01T03:00:00+00:00'

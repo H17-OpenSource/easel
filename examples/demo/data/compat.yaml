@@ -1,0 +1,40 @@
+# Instance-local compatibility rules for the demo; the shipped rules live in the repo's data/compat.yaml.
+schema: easel/compat/1
+basis: synthetic rules for the demo, not model facts
+rules:
+- source_family: illustrious
+  target_family: illustrious
+  artifact_type: lora
+  verdict: native
+  confidence: 1.0
+  reason: same family
+- source_family: sdxl
+  target_family: illustrious
+  artifact_type: lora
+  verdict: degraded
+  confidence: 0.6
+  reason: SDXL-base LoRAs lose strength on Illustrious
+- source_family: sdxl
+  target_family: sdxl
+  artifact_type: lora
+  verdict: native
+  confidence: 1.0
+  reason: same family
+- source_family: illustrious
+  target_family: sdxl
+  artifact_type: lora
+  verdict: works
+  confidence: 0.5
+  reason: usable at lower weight
+- source_family: sdxl
+  target_family: illustrious
+  artifact_type: vae
+  verdict: works
+  confidence: 0.9
+  reason: shared VAE
+- source_family: sdxl
+  target_family: sdxl
+  artifact_type: vae
+  verdict: native
+  confidence: 1.0
+  reason: same family

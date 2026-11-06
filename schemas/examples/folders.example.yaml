@@ -1,0 +1,31 @@
+# Example of easel/folders/1 (synthetic: demo_robot, 2030).
+schema: easel/folders/1
+base_path: '{models_root}'
+comfyui_folders:
+  checkpoints:
+  - checkpoints
+  loras:
+  - loras
+  vae:
+  - vae
+  upscale_models:
+  - upscale_models
+  embeddings:
+  - embeddings
+  controlnet:
+  - controlnet
+  text_encoders:
+  - text_encoders
+  diffusion_models:
+  - unet
+  - diffusion_models
+type_folders:
+  checkpoint: checkpoints
+  lora: loras
+  lycoris: loras
+  vae: vae
+  upscaler: upscale_models
+  embedding: embeddings
+  controlnet: controlnet
+  text_encoder: text_encoders
+  unet: diffusion_models

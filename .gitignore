@@ -1,0 +1,51 @@
+# Nothing private, binary or generated is ever tracked (plan: file-based registries, "Gitignore").
+
+# secrets and local machine files
+.env
+desktop.ini
+.github/hooks/local-*.json
+
+# databases, backups, store locks and atomic-write leftovers
+*.db
+*.db*
+*.sqlite
+*.bak
+.lock
+*.tmp-*
+
+# instance data (an instance lives outside the repo; these catch a misplaced one). They match at every depth:
+# never name a source, test or docs folder instance/, journal/, build/ or dist/.
+instance/
+journal/
+
+# models and weights
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.gguf
+
+# media (fixture images are generated into tests/fixtures/_gen/ at test time)
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.mp4
+*.webm
+*.mov
+tests/fixtures/_gen/
+
+# Python, build and tool caches
+__pycache__/
+*.py[cod]
+.venv*/
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/

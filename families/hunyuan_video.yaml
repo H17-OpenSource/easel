@@ -1,0 +1,37 @@
+# Model family `hunyuan_video` (HunyuanVideo). Public model-family facts only.
+# Shared keys (every top-level key except `schema`, `inference` and `training`) are identical in
+# the easel and kiln copies of this file; `tools/sync_common.py --check` compares them.
+# `inherits`: a block this file leaves out is read from the parent family (the child's keys win).
+# `basis` says where a number comes from: measured on the reference machine, or a prior.
+# `inference`: easel's render defaults for this family.
+
+schema: easel/family/1
+id: hunyuan_video
+name: HunyuanVideo
+status: listed
+inherits: null
+architecture:
+  kind: dit-video
+  latent_channels: 16
+  text_encoders: [llava-llama3]
+  native_resolution: 720
+description: Video DiT with large text encoder.
+licence_summary:
+  status: unverified
+  name: null
+  text: 'unverified: read the model card'
+  url: https://huggingface.co/tencent/HunyuanVideo
+# host_ram_gb: eval not measured, so whether it includes the ComfyUI server is not recorded.
+host_ram_gb:
+  train: null
+  eval: null
+  eval_includes_comfyui_server: null
+  basis: not measured
+inference:
+  graph_compiler: null
+  note: No graph template ships for this family yet.
+  resolution:
+    native: [720, 720]
+  vae:
+    shared_with: []
+    not_interchangeable_with: []

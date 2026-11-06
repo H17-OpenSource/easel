@@ -1,0 +1,34 @@
+{
+  "schema": "easel/run-manifest/1",
+  "run": "run-20300101-001",
+  "written_at": "2030-01-01T10:05:00+00:00",
+  "graph_sha256": "2e595417c3762ea47cc1c1fa37441a5ea2ba13a511d7536a447cab4ea4f67cc5",
+  "comfyui": {
+    "version": "0.43.1",
+    "node_packs": []
+  },
+  "resources": [
+    {
+      "role": "checkpoint",
+      "slot": "",
+      "resource": "bbbabeef2c0d57fe",
+      "sha256": "bbbabeef2c0d57fee02bdbe3dde478d4dd7b29cc8aef5f8b2b5af3cb22d671df",
+      "file_name": "demo-anime-xl.safetensors",
+      "weight": null
+    },
+    {
+      "role": "lora",
+      "slot": "lora.1",
+      "resource": "cf56db17414bcb55",
+      "sha256": "cf56db17414bcb553eafe194951eefdb54abe08f14fa6f04fbe044bb3ff51abc",
+      "file_name": "demo_robot-v1.safetensors",
+      "weight": 0.8
+    }
+  ],
+  "seeds": [
+    1001,
+    1002,
+    1003,
+    1004
+  ]
+}

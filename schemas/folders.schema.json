@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:folders:1",
+  "title": "where model files live under models_root",
+  "description": "Replaces ComfyUI's extra_model_paths.yaml: the folders under {models_root} per ComfyUI folder name, and which folder each resource type is loaded from.",
+  "x-file": "data/folders.yaml",
+  "x-owner": "maintainers",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "base_path",
+    "comfyui_folders",
+    "type_folders"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/folders/1",
+      "description": "the format and its version; always the first key"
+    },
+    "base_path": {
+      "type": "string",
+      "description": "always starts with {models_root}",
+      "pattern": "^\\{models_root\\}"
+    },
+    "comfyui_folders": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/relpath"
+        },
+        "minItems": 1
+      }
+    },
+    "type_folders": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "checkpoint",
+          "lora",
+          "lycoris",
+          "vae",
+          "text_encoder",
+          "clip",
+          "clip_vision",
+          "controlnet",
+          "ipadapter",
+          "upscaler",
+          "embedding",
+          "detector",
+          "sam",
+          "style_model",
+          "unet",
+          "model_patch"
+        ]
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    }
+  },
+  "$defs": {
+    "relpath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$",
+      "description": "a path relative to the root its record names: forward slashes, no drive, no leading slash, no `..`"
+    }
+  }
+}

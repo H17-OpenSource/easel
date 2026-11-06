@@ -1,0 +1,193 @@
+{
+  "schema": "easel/workflow-slots/1",
+  "workflow": "detailer",
+  "slots": [
+    {
+      "name": "checkpoint",
+      "node": "1",
+      "input": "ckpt_name",
+      "kind": "resource",
+      "role": "checkpoint",
+      "required": true,
+      "note": "the checkpoint's file name as the server lists it"
+    },
+    {
+      "name": "positive",
+      "node": "2",
+      "input": "text",
+      "kind": "text",
+      "role": null,
+      "required": true,
+      "note": "the full positive prompt"
+    },
+    {
+      "name": "negative",
+      "node": "3",
+      "input": "text",
+      "kind": "text",
+      "role": null,
+      "required": false,
+      "default": "",
+      "note": null
+    },
+    {
+      "name": "width",
+      "node": "4",
+      "input": "width",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 1024,
+      "note": null
+    },
+    {
+      "name": "height",
+      "node": "4",
+      "input": "height",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 1024,
+      "note": null
+    },
+    {
+      "name": "batch",
+      "node": "4",
+      "input": "batch_size",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 1,
+      "note": null
+    },
+    {
+      "name": "seed",
+      "node": "5",
+      "input": "seed",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 0,
+      "note": null
+    },
+    {
+      "name": "steps",
+      "node": "5",
+      "input": "steps",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 30,
+      "note": null
+    },
+    {
+      "name": "cfg",
+      "node": "5",
+      "input": "cfg",
+      "kind": "float",
+      "role": null,
+      "required": false,
+      "default": 6.0,
+      "note": null
+    },
+    {
+      "name": "sampler",
+      "node": "5",
+      "input": "sampler_name",
+      "kind": "choice",
+      "role": null,
+      "required": false,
+      "default": "dpmpp_2m",
+      "note": null
+    },
+    {
+      "name": "scheduler",
+      "node": "5",
+      "input": "scheduler",
+      "kind": "choice",
+      "role": null,
+      "required": false,
+      "default": "karras",
+      "note": null
+    },
+    {
+      "name": "detector",
+      "node": "7",
+      "input": "model_name",
+      "kind": "resource",
+      "role": "detector",
+      "required": true,
+      "note": "a face detector under the server's ultralytics folder, for example bbox/<file>.pt"
+    },
+    {
+      "name": "detailer.seed",
+      "node": "8",
+      "input": "seed",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 0,
+      "note": null
+    },
+    {
+      "name": "detailer.steps",
+      "node": "8",
+      "input": "steps",
+      "kind": "int",
+      "role": null,
+      "required": false,
+      "default": 20,
+      "note": null
+    },
+    {
+      "name": "detailer.cfg",
+      "node": "8",
+      "input": "cfg",
+      "kind": "float",
+      "role": null,
+      "required": false,
+      "default": 6.0,
+      "note": null
+    },
+    {
+      "name": "detailer.sampler",
+      "node": "8",
+      "input": "sampler_name",
+      "kind": "choice",
+      "role": null,
+      "required": false,
+      "default": "dpmpp_2m",
+      "note": null
+    },
+    {
+      "name": "detailer.scheduler",
+      "node": "8",
+      "input": "scheduler",
+      "kind": "choice",
+      "role": null,
+      "required": false,
+      "default": "karras",
+      "note": null
+    },
+    {
+      "name": "detailer.denoise",
+      "node": "8",
+      "input": "denoise",
+      "kind": "float",
+      "role": null,
+      "required": false,
+      "default": 0.35,
+      "note": null
+    },
+    {
+      "name": "filename_prefix",
+      "node": "9",
+      "input": "filename_prefix",
+      "kind": "text",
+      "role": null,
+      "required": false,
+      "default": "easel/detailer",
+      "note": "the runner sets easel/<run-id>"
+    }
+  ]
+}

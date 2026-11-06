@@ -1,0 +1,21 @@
+{
+  "schema": "easel/run-review-event/1",
+  "at": "2030-01-01T12:00:00+00:00",
+  "v": 1,
+  "source": "operator",
+  "by": "easel runs review",
+  "run": "run-20300101-001",
+  "n": 1,
+  "verdict": "keep",
+  "checks": {
+    "face": "pass",
+    "head": "pass",
+    "colours": "pass",
+    "body": "pass",
+    "feature": "pass",
+    "hands": "na"
+  },
+  "note": null,
+  "via": "app",
+  "legacy_id": null
+}

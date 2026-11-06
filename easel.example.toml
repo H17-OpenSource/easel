@@ -1,0 +1,84 @@
+# easel.example.toml: copy to <home>/easel.toml (for example ~/easel-home/easel.toml) and edit the copy.
+# Found in this order: --workspace, $EASEL_HOME, upward from the current folder, ~/.config/easel/.
+# Any key can be overridden with EASEL_<SECTION>__<KEY>. `easel config show` prints every value with its source;
+# `easel config set <section.key> <value>` edits your copy safely.
+# ${VAR} values are expanded at load time; an unset variable is a FAIL in `easel doctor` and exit 2 elsewhere.
+# Absolute paths belong only in your instance copy, never in a repository file.
+schema = "easel/config/1"
+
+[instance]
+name = "home"
+adopted = false                 # true = an existing workspace that easel drives through its own runner
+
+[paths]                         # relative paths are relative to the instance root
+root = "."
+models_root = "${MODELS_ROOT}"  # <models_root>: the folder that holds checkpoints/, loras/, ...
+runs = "runs"
+recipes = "recipes"
+registry = "registry"
+journal = "journal"
+runtime = "runtime"
+
+[comfyui]
+url = "http://127.0.0.1:8188"   # ComfyUI's upstream default; the server you use may listen elsewhere
+dir = ""                        # <comfyui_dir>: only when easel starts and stops the server itself
+python = ""                     # <comfyui_python>: that ComfyUI's interpreter
+min_version = "0.43.0"
+manage_lifecycle = false
+start_args = []                 # extra flags when easel starts the server (manage_lifecycle = true); none by default.
+# Optional ComfyUI flags, added only when the case applies (`python main.py --help` in your ComfyUI lists the
+# names your version accepts):
+#   "--lowvram"                  the model does not fit in GPU memory (slower; "--novram" is the last resort)
+#   "--disable-smart-memory"     other programs need the memory between renders: models unload after each prompt
+#   "--preview-method", "none"   no live previews (easel never shows them), a little less GPU work per step
+#   "--disable-pinned-memory"    host RAM is tight: ComfyUI does not pin model weights in host memory
+
+[limits]
+host_ram_floor_gb = 2.0
+disk_floor_gb = 20              # free disk (GB) a download or a render must leave; set what your models and runs need
+max_concurrent_gpu_jobs = 1     # the RAM a job needs comes from families/<family>.yaml host_ram_gb
+
+[scheduler]
+kind = "none"                   # none = wait for free RAM and disk locally; a command adapter is configured per machine
+fail_open = false
+
+[jobs]
+allowed = [{tool = "easel", verb = "run", pausable = false}]
+
+[registry]
+backend = "files"
+
+[review]
+bind = "127.0.0.1"
+port = 8742
+
+[policy]
+reviewer = "human-only"
+prompt_authoring = "sfw-only"
+unknown_rating_is = "nsfw"
+second_source_name = "assistant"
+render = "native"                    # native | legacy-runner
+subjects = "fictional-adults-only"   # recipe propose refuses age-down and real-person tokens
+
+[privacy]
+wordlist = "${PRIVATE_WORDS_FILE}"   # your private word list, kept outside every repository
+headless = true
+
+[adopt]
+# Only on an adopted instance. Every value is a fact about the host workspace and stays in your copy:
+# tools_dir = "<host_tools_dir>"
+# output_root = "<host_output_root>"
+# training_root = "<host_training_root>"
+# generated_dir = "<host_generated_dir>"
+# launcher_template = "<host_launcher_template>"
+# dataset_template = "<host_dataset_template>"
+# renderer = "<host_renderer>"
+# run_registry = "<host_run_registry>"
+# propose_command = "<command template>"
+# dryrun_command = "<command template>"
+# submit_command = "<command template>"
+# status_command = "<command template>"
+
+[env_aliases]
+# Map an environment variable of your own setup to a key, for example:
+# "<OLD_NAME>" = "paths.models_root"

@@ -1,0 +1,50 @@
+name: "Resource knowledge"
+description: "What a public model does in practice: its range, how it stacks, the weights and negatives that work."
+title: "[resource-knowledge] <family>: <one line>"
+labels: ["resource-knowledge"]
+body:
+  - type: markdown
+    attributes:
+      value: "Share a finding about a publicly available model with the evidence behind it. Name the model by its public name and family; never attach images. Leave out private values: no absolute paths (write `<home>`, `<models_root>`), no names or account names, no tokens, no ids of your own records, and no description of any image. Vulnerabilities do not belong here: see SECURITY.md."
+  - type: input
+    id: resource
+    attributes:
+      label: "resource"
+      description: "its public name, type and family, for example: a style LoRA for illustrious"
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: "finding"
+      description: "what you observed, in one or two sentences"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "evidence"
+      description: "how many renders, which settings, which date; verdicts by a person, never an assistant's reading"
+    validations:
+      required: true
+  - type: textarea
+    id: rule
+    attributes:
+      label: "proposed rule"
+      description: "what a recipe should do because of it"
+    validations:
+      required: true
+  - type: input
+    id: recorded_in
+    attributes:
+      label: "where it belongs"
+      description: "for example: docs/WHEN-TO-APPLY.md, or a lessons entry for the family"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: "Before you submit"
+      options:
+        - label: "I removed private values: no absolute paths, names, account names, tokens or ids of my own records, and no images."
+          required: true

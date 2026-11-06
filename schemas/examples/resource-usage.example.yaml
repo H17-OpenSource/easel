@@ -1,0 +1,10 @@
+# Example of easel/resource-usage/1 (synthetic: demo_robot, 2030).
+schema: easel/resource-usage/1
+resource: bbbabeef2c0d57fe
+entries:
+- upstream_revision: '9000000102'
+  model_description: A synthetic anime checkpoint for the demo.
+  version_notes: First version.
+  usage_rules: CFG 5-6, 28 steps, clip skip 2
+  fetched_at: '2030-01-01T02:01:00+00:00'
+legacy_id: null

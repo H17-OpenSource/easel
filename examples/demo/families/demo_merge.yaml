@@ -1,0 +1,17 @@
+# An instance-local family: blocks it leaves out are read from illustrious (the child's keys win).
+schema: easel/family/1
+id: demo_merge
+name: Demo Merge XL
+status: unverified
+inherits: illustrious
+description: 'an instance-local family for the demo: an Illustrious merge'
+licence_summary:
+  status: unknown
+  name: null
+  text: 'synthetic family: no licence to read'
+  url: null
+host_ram_gb:
+  train: 5.5
+  eval: 8.5
+  eval_includes_comfyui_server: true
+  basis: inherited from illustrious; not measured

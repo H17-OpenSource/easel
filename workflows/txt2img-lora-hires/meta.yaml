@@ -1,0 +1,19 @@
+# The shipped workflow template `txt2img-lora-hires` (easel/workflow-meta/1); checked by `easel workflows check`.
+schema: easel/workflow-meta/1
+id: txt2img-lora-hires
+name: txt2img with one LoRA and a latent hires pass
+legacy_id: null
+domain: image
+task: txt2img
+status: draft
+family: sdxl
+comfyui_min_version: 0.43.0
+node_packs: []
+files:
+  graph: graph.json
+  slots: slots.json
+validated_at: null
+validator_note: null
+approved_at: null
+notes: 'Core ComfyUI nodes only: one LoRA on model and CLIP, then a latent upscale
+  and a second sampler pass.'

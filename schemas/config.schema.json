@@ -1,0 +1,422 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:config:1",
+  "title": "easel instance configuration (easel.toml)",
+  "description": "The one TOML file at the instance root (<home>/easel.toml). Found in this order: --workspace, $EASEL_HOME, upward from the current folder, ~/.config/easel/. Any key can be overridden with EASEL_<SECTION>__<KEY>. `easel config set <section.key> <value>` validates against this schema and refuses an unknown key or a wrong type (exit 2, file unchanged). Absolute paths belong only in an instance copy, never in a shipped file.",
+  "x-file": "<home>/easel.toml",
+  "x-owner": "person (edited through `config set`)",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/config/1",
+      "description": "the format and its version; always the first key"
+    },
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "a short name for this instance"
+        },
+        "adopted": {
+          "type": "boolean",
+          "description": "true = an existing workspace the tool works beside through its own runner"
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "description": "where the instance keeps its data. Relative paths are relative to the instance root; ${VAR} is expanded at load time. images_root (kiln, adopted projects only) is read-only until cutover",
+      "additionalProperties": false,
+      "properties": {
+        "root": {
+          "type": "string"
+        },
+        "models_root": {
+          "type": "string",
+          "description": "<models_root>: the folder that holds checkpoints/, loras/, ..."
+        },
+        "extra_model_roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "more folders laid out like <models_root> (ComfyUI can map several base paths), scanned after models_root; the first root that has a file name wins, and downloads always land in models_root"
+        },
+        "runs": {
+          "type": "string"
+        },
+        "recipes": {
+          "type": "string"
+        },
+        "registry": {
+          "type": "string"
+        },
+        "journal": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "references": {
+          "type": "string"
+        },
+        "candidates": {
+          "type": "string"
+        },
+        "lessons": {
+          "type": "string"
+        },
+        "standards": {
+          "type": "string"
+        },
+        "jobs": {
+          "type": "string"
+        },
+        "workflows": {
+          "type": "string"
+        }
+      }
+    },
+    "comfyui": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "the ComfyUI server's base URL; ComfyUI's upstream default is http://127.0.0.1:8188"
+        },
+        "dir": {
+          "type": "string",
+          "description": "<comfyui_dir>: only when the tool starts and stops the server itself"
+        },
+        "python": {
+          "type": "string",
+          "description": "<comfyui_python>: that ComfyUI's interpreter"
+        },
+        "min_version": {
+          "type": "string",
+          "description": "the oldest ComfyUI version the graphs are tested with",
+          "pattern": "^(\\d+\\.\\d+\\.\\d+)?$"
+        },
+        "manage_lifecycle": {
+          "type": "boolean",
+          "description": "true = the tool may start and stop the server"
+        },
+        "start_args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "extra arguments when the tool starts the server; none by default"
+        },
+        "timeout_s": {
+          "type": "number",
+          "description": "seconds to wait for one HTTP answer",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "description": "RAM needed per job comes from families/<f>.yaml host_ram_gb, not from here",
+      "additionalProperties": false,
+      "properties": {
+        "host_ram_floor_gb": {
+          "type": "number",
+          "description": "free host RAM never given away to a job",
+          "minimum": 0
+        },
+        "disk_floor_gb": {
+          "type": "number",
+          "description": "free disk in GB that a download, a render or a write must leave; each instance sets its own",
+          "minimum": 0
+        },
+        "max_concurrent_gpu_jobs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "skip_ram_check": {
+          "type": "boolean",
+          "description": "true = start jobs without measuring free RAM (only where it cannot be measured)"
+        }
+      }
+    },
+    "scheduler": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "command"
+          ],
+          "description": "none = wait for free RAM and disk locally; command = call the *_command templates"
+        },
+        "fail_open": {
+          "type": "boolean",
+          "description": "true = run anyway when the scheduler cannot be reached (default false: fail closed)"
+        },
+        "poll_s": {
+          "type": "number",
+          "description": "seconds between checks while waiting",
+          "exclusiveMinimum": 0
+        },
+        "stop_file": {
+          "type": "string",
+          "description": "a file whose appearance asks a running job to yield"
+        },
+        "plan_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "ready_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "wait_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "start_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "check_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "requeue_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "done_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "cancel_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        },
+        "update_command": {
+          "type": "string",
+          "description": "a command template for this scheduler verb; written per machine, never shipped"
+        }
+      }
+    },
+    "jobs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "tool",
+              "verb",
+              "pausable"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "tool": {
+                "enum": [
+                  "easel",
+                  "kiln"
+                ]
+              },
+              "verb": {
+                "type": "string",
+                "pattern": "^[a-z][a-z-]*$"
+              },
+              "pausable": {
+                "type": "boolean"
+              }
+            }
+          },
+          "description": "the GPU verbs a scheduler may start for this instance; empty = none"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bind": {
+          "type": "string",
+          "description": "address the review page listens on"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reviewer": {
+          "enum": [
+            "human-only",
+            "assistant-may-read-sfw"
+          ],
+          "description": "who may look at images: only the person (default), or the assistant too for sfw images, its read labelled \"assistant's read, not the verdict\""
+        },
+        "prompt_authoring": {
+          "enum": [
+            "sfw-only",
+            "user-text-only"
+          ],
+          "description": "sfw-only = the assistant may write sfw prompt text; user-text-only = only the person's words go into prompts"
+        },
+        "unknown_rating_is": {
+          "enum": [
+            "nsfw"
+          ],
+          "description": "unknown content is never treated as sfw"
+        },
+        "second_source_name": {
+          "type": "string",
+          "description": "the name verdicts and notes from the assistant are stored under",
+          "pattern": "^(?!operator$)[a-z][a-z0-9_-]*$"
+        },
+        "render": {
+          "enum": [
+            "native",
+            "legacy-runner"
+          ],
+          "description": "legacy-runner = an adopted workspace renders through its own runner; GPU verbs then refuse and point at the lines `recipe to-legacy` prints"
+        },
+        "subjects": {
+          "enum": [
+            "fictional-adults-only"
+          ],
+          "description": "subjects are fictional adults; prompts, captions and specs that make a subject read as a minor or depict a real person are refused"
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "wordlist": {
+          "type": "string",
+          "description": "your private word list, kept outside every repository; empty = none"
+        },
+        "extra_patterns": {
+          "type": "string",
+          "description": "an optional file of extra scan patterns in the format of data/privacy/public-patterns.yaml (for example the id shapes of your own records), kept outside every repository; ${VAR} allowed; empty = none"
+        },
+        "headless": {
+          "type": "boolean",
+          "description": "true = never open a window"
+        }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "enum": [
+            "files"
+          ]
+        }
+      }
+    },
+    "search": {
+      "type": "object",
+      "description": "search and download over the public Civitai API (/api/v1/, /api/download/) and the HF API",
+      "additionalProperties": false,
+      "properties": {
+        "civitai_token_env": {
+          "type": "string",
+          "description": "name of the environment variable that holds a Civitai API token (the token itself never goes into a file)",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "hf_token_env": {
+          "type": "string",
+          "description": "name of the environment variable that holds a Hugging Face token",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "cache_hours": {
+          "type": "number",
+          "description": "how long an API answer is reused",
+          "minimum": 0
+        },
+        "requests_per_s": {
+          "type": "number",
+          "description": "rate limit per site",
+          "exclusiveMinimum": 0
+        },
+        "max_file_gb": {
+          "type": "number",
+          "description": "`search vet` marks a larger file too-big",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "adopt": {
+      "type": "object",
+      "description": "only on an adopted instance: host facts and the four command templates that `easel recipe to-legacy` renders (propose, dry-run, submit, status)",
+      "additionalProperties": false,
+      "properties": {
+        "tools_dir": {
+          "type": "string"
+        },
+        "output_root": {
+          "type": "string"
+        },
+        "training_root": {
+          "type": "string"
+        },
+        "generated_dir": {
+          "type": "string"
+        },
+        "launcher_template": {
+          "type": "string"
+        },
+        "dataset_template": {
+          "type": "string"
+        },
+        "renderer": {
+          "type": "string"
+        },
+        "run_registry": {
+          "type": "string"
+        },
+        "propose_command": {
+          "type": "string"
+        },
+        "dryrun_command": {
+          "type": "string"
+        },
+        "submit_command": {
+          "type": "string"
+        },
+        "status_command": {
+          "type": "string"
+        }
+      }
+    },
+    "env_aliases": {
+      "type": "object",
+      "description": "map an environment variable of your own setup to a key: \"<OLD_NAME>\" = \"section.key\"",
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z_]+\\.[a-z_]+$"
+      }
+    }
+  }
+}

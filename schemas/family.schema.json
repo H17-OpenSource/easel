@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:easel:family:1",
+  "title": "model family (easel)",
+  "description": "One model family per file, families/<id>.yaml. The shared keys (all but `schema` and the tool block) are identical in the easel and kiln copies; `sync_common.py --check` compares them. A family with `inherits` reads the blocks it leaves out from its parent, except `licence_summary` and `host_ram_gb`, which every file carries.",
+  "x-file": "families/<id>.yaml",
+  "x-owner": "maintainers (generated from one private source)",
+  "x-kind": "record",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "status",
+    "inherits",
+    "licence_summary",
+    "host_ram_gb"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "easel/family/1",
+      "description": "the format and its version; always the first key"
+    },
+    "id": {
+      "$ref": "#/$defs/family_id",
+      "description": "equals the file stem"
+    },
+    "name": {
+      "type": "string",
+      "description": "display name"
+    },
+    "status": {
+      "enum": [
+        "tested",
+        "experimental",
+        "unverified",
+        "listed"
+      ],
+      "description": "tested = trained or rendered with on the reference machine; experimental = run once, not in the tested path; unverified = priors only; listed = known, no recipe"
+    },
+    "inherits": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/family_id"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "the parent family; a block this file leaves out is read from the parent (deep merge, the child's keys win)"
+    },
+    "architecture": {
+      "type": "object",
+      "required": [
+        "kind",
+        "latent_channels",
+        "text_encoders",
+        "native_resolution"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "for example unet-sdxl, dit-flux; unknown when not known"
+        },
+        "latent_channels": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "text_encoders": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "native_resolution": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "the side length in pixels the family was trained at"
+        }
+      }
+    },
+    "description": {
+      "type": "string"
+    },
+    "licence_summary": {
+      "type": "object",
+      "description": "the base model's licence in one line; every family carries its own, inherited or not (families check fails otherwise). It is the fallback for foundation bases only: a resource's own licence block wins",
+      "required": [
+        "status",
+        "name",
+        "text",
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "verified",
+            "unverified",
+            "unknown"
+          ]
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the licence's name, null when not recorded"
+        },
+        "text": {
+          "type": "string",
+          "description": "one line a person can act on, for example 'unverified: read the model card'"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/url"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "the model card; null is allowed (families check warns)"
+        },
+        "spdx": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "checked_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "host_ram_gb": {
+      "type": "object",
+      "description": "what the scheduler waits for before it starts a job of this family",
+      "required": [
+        "train",
+        "eval",
+        "eval_includes_comfyui_server",
+        "basis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "train": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "free host RAM a training step needs",
+          "minimum": 0
+        },
+        "eval": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "free host RAM an eval render needs",
+          "minimum": 0
+        },
+        "eval_includes_comfyui_server": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "true = the eval number already covers the ComfyUI server"
+        },
+        "basis": {
+          "type": "string",
+          "description": "measured on the reference machine, inherited, or a prior; say which"
+        }
+      }
+    },
+    "inference": {
+      "type": "object",
+      "description": "easel's render defaults for this family",
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "type": "string"
+        },
+        "graph_compiler": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the graph compiler in _common.comfy_graph; null = no template ships yet"
+        },
+        "note": {
+          "type": "string"
+        },
+        "sampler": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scheduler": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "steps": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "cfg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "clip_skip": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "resolution": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "native": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "presets": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "style": {
+              "type": "string",
+              "description": "natural | tags"
+            },
+            "prefix": {
+              "type": "string"
+            },
+            "suffix": {
+              "type": "string"
+            },
+            "order": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "negative_baseline": {
+          "type": "string"
+        },
+        "lora_default_weight": {
+          "type": "number"
+        },
+        "hires": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "scale": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "denoise": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "steps": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mode": {
+                  "enum": [
+                    "latent",
+                    "model"
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "vae": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "shared_with": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/family_id"
+              }
+            },
+            "not_interchangeable_with": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/family_id"
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "inherits": {
+        "type": "null"
+      }
+    }
+  },
+  "then": {
+    "required": [
+      "architecture",
+      "description",
+      "inference"
+    ]
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "a date, YYYY-MM-DD"
+    },
+    "family_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "a model family id: the stem of families/<id>.yaml"
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://",
+      "description": "an http(s) URL"
+    }
+  }
+}

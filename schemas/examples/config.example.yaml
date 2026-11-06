@@ -1,0 +1,68 @@
+# Example of easel/config/1 (synthetic: demo_robot, 2030).
+schema: easel/config/1
+instance:
+  name: home
+  adopted: true
+paths:
+  root: .
+  models_root: ${MODELS_ROOT}
+  runs: runs
+  recipes: recipes
+  registry: registry
+  journal: journal
+  runtime: runtime
+comfyui:
+  url: http://127.0.0.1:8188
+  dir: ''
+  python: ''
+  min_version: 0.43.0
+  manage_lifecycle: false
+  start_args:
+  - --offline
+  timeout_s: 30
+limits:
+  host_ram_floor_gb: 2.0
+  disk_floor_gb: 100
+  max_concurrent_gpu_jobs: 1
+scheduler:
+  kind: none
+  fail_open: false
+jobs:
+  allowed: []
+registry:
+  backend: files
+review:
+  bind: 127.0.0.1
+  port: 8742
+policy:
+  reviewer: human-only
+  prompt_authoring: sfw-only
+  unknown_rating_is: nsfw
+  second_source_name: assistant
+  render: legacy-runner
+  subjects: fictional-adults-only
+privacy:
+  wordlist: ${PRIVATE_WORDS_FILE}
+  headless: true
+search:
+  civitai_token_env: CIVITAI_API_TOKEN
+  hf_token_env: HF_TOKEN
+  cache_hours: 24
+  requests_per_s: 1
+  max_file_gb: 8
+adopt:
+  tools_dir: <host_tools_dir>
+  output_root: <host_output_root>
+  training_root: <host_training_root>
+  generated_dir: <host_generated_dir>
+  launcher_template: <host_launcher_template>
+  dataset_template: <host_dataset_template>
+  renderer: <host_renderer>
+  run_registry: <host_run_registry>
+  propose_command: <host propose command> {recipe_json}
+  dryrun_command: <host render command> {recipe_id} --dry-run
+  submit_command: <host submit command> --by <agent> --title {recipe_id} --cmd "<host render command> {recipe_id}
+    --count {count}" --minutes 15 --gb 3.7
+  status_command: <host status command> {job_id}
+env_aliases:
+  OLD_MODELS_DIR: paths.models_root

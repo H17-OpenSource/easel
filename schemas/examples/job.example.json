@@ -1,0 +1,48 @@
+{
+  "schema": "easel/job/1",
+  "id": "job-20300101-001",
+  "created_at": "2030-01-01T09:45:00+00:00",
+  "tool": "easel",
+  "verb": "run",
+  "args": [
+    "rcp-20300101-001",
+    "--count",
+    "4"
+  ],
+  "title": "rcp-20300101-001",
+  "by": "operator",
+  "family": "illustrious",
+  "host_ram_gb": 8.5,
+  "minutes": 15,
+  "pausable": false,
+  "status": "done",
+  "scheduler": {
+    "kind": "none",
+    "ref": null
+  },
+  "target": {
+    "recipe": "rcp-20300101-001",
+    "run": "run-20300101-001"
+  },
+  "started_at": "2030-01-01T10:00:00+00:00",
+  "finished_at": "2030-01-01T10:05:00+00:00",
+  "exit_code": 0,
+  "log": "jobs/job-20300101-001.log",
+  "history": [
+    {
+      "at": "2030-01-01T09:45:00+00:00",
+      "status": "waiting",
+      "note": null
+    },
+    {
+      "at": "2030-01-01T10:00:00+00:00",
+      "status": "running",
+      "note": "free RAM 9.1 GB >= 8.5 GB"
+    },
+    {
+      "at": "2030-01-01T10:05:00+00:00",
+      "status": "done",
+      "note": null
+    }
+  ]
+}
