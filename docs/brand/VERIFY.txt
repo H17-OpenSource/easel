@@ -1,0 +1,10 @@
+Symmetry checks on svg/easel-cream.svg, rendered by Chromium at 4 px per unit
+(mirror checks are (differing pixels, gold pixels); stems are (width, centre) per stem;
+ circles are (min, max) radius of the edge pixels, then the design radius)
+
+the frame sides at mid height (width, centre): [(112.0, -344.0), (112.0, 344.0)]
+the diamond at its widest (width, centre): [(352.0, 0.0)]
+the ledge's ends (width, centre): [(1000.0, 0.0)]
+the legs at mid height (horizontal width, centre): [(120.5, -296.5), (120.5, 296.5)]
+whole mark about its axis: (36, 6801148)
+edge pixels (scale for the mirror count): 15872

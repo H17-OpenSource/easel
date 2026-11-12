@@ -1,0 +1,19 @@
+{
+  "typeface": "PlusJakartaSans",
+  "licence": "SIL Open Font License 1.1",
+  "wght": 800,
+  "opsz": "the font's largest (display) optical size, where it has one",
+  "text": "Easel",
+  "kerning": "the font's own (HarfBuzz shaping)",
+  "stacked": {
+    "cap_height": "0.19 H",
+    "gap": "0.1 H from the mark's foot to the cap line",
+    "align": "centred on the mark's axis"
+  },
+  "horizontal": {
+    "cap_height": "0.36 H",
+    "gap": "0.22 H after the mark",
+    "align": "caps centred on the mark's middle"
+  },
+  "H": 1000
+}

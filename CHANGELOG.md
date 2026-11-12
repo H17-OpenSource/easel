@@ -24,3 +24,5 @@ date.
 - CI on Linux and Windows with every gate, including the pip-licenses `--allow-only` licence gate (proven by
   `tests/test_licence_gate.py`) and a gitleaks job pinned by version and checksum.
 - `tools/pre-push-gate` with `tools/install-hooks.py`, and `tools/gen_notices.py` with `THIRD_PARTY_NOTICES.md`.
+- The logo (#1): the concept redrawn as a parametric vector mark, with the word mark, the lockups, a small cut for
+  48 px and below, the icons and its construction, in `docs/brand/`; the README header shows it.

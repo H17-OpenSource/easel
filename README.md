@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/app-slots/readme-dark.svg">
+    <img alt="The easel logo" src="docs/brand/app-slots/readme-light.svg" height="120">
+  </picture>
+</p>
+
 # easel
 
 easel is an agent-friendly, file-based workflow for rendering images with ComfyUI. It keeps a registry of the
